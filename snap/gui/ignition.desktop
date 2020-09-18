@@ -19,6 +19,6 @@ Terminal=false
 
 #MimeType=image/jpg;
 
-#Icon=${SNAP}/meta/gui/icon.svg
+Icon=${SNAP}/meta/gui/icon.svg
 
-#X-Unity-IconBackgroundColor=#252525
+X-Unity-IconBackgroundColor=#252525
