@@ -9,19 +9,6 @@ grade: devel
 confinement: strict
 base: core18
 
-# package-repositories:
-#     # DART
-#     - type: apt
-#       ppa: dartsim/ppa
-#     # Ogre2
-#     - type: apt
-#       formats: [deb]
-#       key-id: 67170598AF249743
-#       key-server: hkp://keyserver.ubuntu.com:80
-#       url: http://packages.osrfoundation.org/gazebo/ubuntu-stable
-#       suites: [bionic]
-#       components: [main]
-
 parts:
 
   dart:
@@ -50,7 +37,6 @@ parts:
     after: [dart, ogre2]
     plugin: colcon
     source: .
-    # source: https://github.com/ignition-tooling/gazebodistro.git
     colcon-cmake-args:
       - "-DBUILD_TESTING=OFF"
       - "-DENABLE_TESTING=OFF"
@@ -95,13 +81,6 @@ parts:
       - qtbase5-dev
       - qtdeclarative5-dev
       - qtquickcontrols2-5-dev
-      # - dart6-data
-      # - libdart6-collision-ode-dev
-      # - libdart6-external-odelcpsolver-dev
-      # - libdart6-dev
-      # - libdart6-utils-urdf-dev
-      # - libogre-1.9-dev
-      # - libogre-2.1-dev
     stage-packages:
       - libassimp4
       - libboost-filesystem1.65.1
@@ -150,12 +129,12 @@ parts:
       mkdir src && cd src
       if [ ! -f collection-citadel.yaml ]; then wget https://raw.githubusercontent.com/ignition-tooling/gazebodistro/master/collection-citadel.yaml; fi
       vcs import < collection-citadel.yaml
-      sed -i 's|${CMAKE_INSTALL_PREFIX}|/snap/$SNAPCRAFT_PROJECT_NAME/current/opt/ros/snap|' ign-gazebo/include/ignition/gazebo/config.hh.in
-      sed -i 's|${CMAKE_INSTALL_PREFIX}|/snap/$SNAPCRAFT_PROJECT_NAME/current/opt/ros/snap|' ign-gui/include/ignition/gui/config.hh.in
-      sed -i 's|IGN_RENDERING_PLUGIN_PATH|"/snap/$SNAPCRAFT_PROJECT_NAME/current/opt/ros/snap/lib"|' ign-rendering/src/RenderEngineManager.cc
-      sed -i 's|OGRE2_RESOURCE_PATH|"/snap/$SNAPCRAFT_PROJECT_NAME/current/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/OGRE-2.1/OGRE"|' ign-rendering/ogre2/src/Ogre2RenderEngine.cc
-      sed -i 's|OGRE_RESOURCE_PATH|"/snap/$SNAPCRAFT_PROJECT_NAME/current/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/OGRE-1.9.0"|' ign-rendering/ogre/src/OgreRenderEngine.cc
-      sed -i 's|@IGN_SENSORS_PLUGIN_PATH@|/snap/$SNAPCRAFT_PROJECT_NAME/current/opt/ros/snap/lib|' ign-sensors/include/ignition/sensors/config.hh.in
+      sed -i "s|\${CMAKE_INSTALL_PREFIX}|/snap/$SNAPCRAFT_PROJECT_NAME/current/opt/ros/snap|" ign-gazebo/include/ignition/gazebo/config.hh.in
+      sed -i "s|\${CMAKE_INSTALL_PREFIX}|/snap/$SNAPCRAFT_PROJECT_NAME/current/opt/ros/snap|" ign-gui/include/ignition/gui/config.hh.in
+      sed -i "s|IGN_RENDERING_PLUGIN_PATH|\"/snap/$SNAPCRAFT_PROJECT_NAME/current/opt/ros/snap/lib\"|" ign-rendering/src/RenderEngineManager.cc
+      sed -i "s|OGRE2_RESOURCE_PATH|\"/snap/$SNAPCRAFT_PROJECT_NAME/current/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/OGRE-2.1/OGRE\"|" ign-rendering/ogre2/src/Ogre2RenderEngine.cc
+      sed -i "s|OGRE_RESOURCE_PATH|\"/snap/$SNAPCRAFT_PROJECT_NAME/current/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/OGRE-1.9.0\"|" ign-rendering/ogre/src/OgreRenderEngine.cc
+      sed -i "s|@IGN_SENSORS_PLUGIN_PATH@|/snap/$SNAPCRAFT_PROJECT_NAME/current/opt/ros/snap/lib|" ign-sensors/include/ignition/sensors/config.hh.in
     override-build: |
       snapcraftctl build
       for entry in "$SNAPCRAFT_PART_INSTALL/opt/ros/snap/share/ignition"/*.yaml; do
@@ -175,30 +154,3 @@ apps:
     command: usr/bin/ruby $SNAP/opt/ros/snap/bin/ign
     plugs: [network, network-bind, opengl, home]
     extensions: [kde-neon]
-
-
-# sed -i 's|$SNAPCRAFT_PART_INSTALL|/snap/$SNAPCRAFT_PROJECT_NAME/current|' "$entry"
-# sed -i 's/\/root\/parts\/ignition\/install\//\/snap\/$SNAPCRAFT_PROJECT_NAME\/current\//' "$entry"
-#
-# override-pull: |
-#       mkdir src && cd src
-#       if [ ! -f collection-citadel.yaml ]; then wget https://raw.githubusercontent.com/ignition-tooling/gazebodistro/master/collection-citadel.yaml; fi
-#       vcs import < collection-citadel.yaml
-#       sed -i 's/${CMAKE_INSTALL_PREFIX}/\/snap\/ignition\/current\/opt\/ros\/snap/' ign-gazebo/include/ignition/gazebo/config.hh.in
-#       sed -i 's/${CMAKE_INSTALL_PREFIX}/\/snap\/ignition\/current\/opt\/ros\/snap/' ign-gui/include/ignition/gui/config.hh.in
-#       sed -i 's/IGN_RENDERING_PLUGIN_PATH/"\/snap\/ignition\/current\/opt\/ros\/snap\/lib"/' ign-rendering/src/RenderEngineManager.cc
-#       sed -i 's/OGRE2_RESOURCE_PATH/"\/snap\/ignition\/current\/usr\/lib\/x86_64-linux-gnu\/OGRE-2.1\/OGRE"/' ign-rendering/ogre2/src/Ogre2RenderEngine.cc
-#       sed -i 's/OGRE_RESOURCE_PATH/"\/snap\/ignition\/current\/usr\/lib\/x86_64-linux-gnu\/OGRE-1.9.0"/' ign-rendering/ogre/src/OgreRenderEngine.cc
-#       sed -i 's/@IGN_SENSORS_PLUGIN_PATH@/\/snap\/ignition\/current\/opt\/ros\/snap\/lib/' ign-sensors/include/ignition/sensors/config.hh.in
-#     override-build: |
-#       snapcraftctl build
-#       for entry in "$SNAPCRAFT_PART_INSTALL/opt/ros/snap/share/ignition/"/*.yaml; do
-#         sed -i 's/\/root\/parts\/$SNAPCRAFT_PROJECT_NAME\/install\//\/snap\/$SNAPCRAFT_PROJECT_NAME\/current\//' "$entry"
-#       done
-#
-# apps:
-#   ignition:
-#     environment:
-#       RUBYLIB: '$SNAP/usr/local/lib/site_ruby/2.5.0:$SNAP/usr/local/lib/x86_64-linux-gnu/site_ruby:$SNAP/usr/local/lib/site_ruby:$SNAP/usr/lib/ruby/vendor_ruby/2.5.0:$SNAP/usr/lib/x86_64-linux-gnu/ruby/vendor_ruby/2.5.0:$SNAP/usr/lib/ruby/vendor_ruby:$SNAP/usr/lib/ruby/2.5.0:$SNAP/usr/lib/x86_64-linux-gnu/ruby/2.5.0'
-
-# sed -i 's|$SNAPCRAFT_PART_INSTALL|/snap/$SNAPCRAFT_PROJECT_NAME/current|' "$entry"
