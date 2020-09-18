@@ -1,0 +1,24 @@
+[Desktop Entry]
+Name=Ignition
+GenericName=Robotics Simulation
+Comment=Simulate before you build
+
+X-GNOME-FullName=Ignition Citadel
+
+Version=1.0
+
+Type=Application
+Categories=Robotics;Simulation;
+# TRANSLATORS: Search terms to find this application. Do NOT translate or localize the semicolons! The list MUST also end with a semicolon!
+Keywords=robotics;simulator;simulation;
+
+Exec=ignition gazebo
+TryExec=ignition
+Terminal=false
+#StartupNotify=true
+
+#MimeType=image/jpg;
+
+#Icon=${SNAP}/meta/gui/icon.svg
+
+#X-Unity-IconBackgroundColor=#252525
