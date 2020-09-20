@@ -22,8 +22,7 @@ parts:
         libdart6-collision-ode-dev \
         libdart6-external-odelcpsolver-dev \
         libdart6-utils-urdf-dev
-    build-packages:
-      - software-properties-common
+    build-packages: [software-properties-common]
 
   ogre2:
     plugin: nil
@@ -31,7 +30,7 @@ parts:
       apt-key adv --fetch-keys http://packages.osrfoundation.org/gazebo.key
       apt-add-repository -yu http://packages.osrfoundation.org/gazebo/ubuntu-stable
       apt install -y libogre-1.9-dev libogre-2.1-dev
-    build-packages: [software-properties-common]
+    build-packages: [software-properties-common, dirmngr]
 
   ignition:
     after: [dart, ogre2]
