@@ -14,7 +14,8 @@ parts:
   dart:
     plugin: nil
     override-pull: |
-      apt --yes install software-properties-common dirmngr --install-recommends
+      set -x; apt remove dirmngr -y; apt install dirmngr --install-recommends -y
+      apt --yes install software-properties-common
       apt-add-repository -yu ppa:dartsim/ppa
       apt install -y \
         dart6-data \
@@ -26,7 +27,8 @@ parts:
   ogre2:
     plugin: nil
     override-pull: |
-      apt --yes install software-properties-common dirmngr --install-recommends
+      set -x; apt remove dirmngr -y; apt install dirmngr --install-recommends -y
+      apt --yes install software-properties-common
       apt-key adv --fetch-keys http://packages.osrfoundation.org/gazebo.key
       apt-add-repository -yu http://packages.osrfoundation.org/gazebo/ubuntu-stable
       apt install -y libogre-1.9-dev libogre-2.1-dev
