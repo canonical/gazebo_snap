@@ -12,8 +12,8 @@ Categories=Robotics;Simulation;
 # TRANSLATORS: Search terms to find this application. Do NOT translate or localize the semicolons! The list MUST also end with a semicolon!
 Keywords=robotics;simulator;simulation;
 
-Exec=ignition gazebo
-TryExec=ignition
+Exec=ignition-robotics.ign gazebo
+TryExec=ignition-robotics.ign
 Terminal=false
 #StartupNotify=true
 

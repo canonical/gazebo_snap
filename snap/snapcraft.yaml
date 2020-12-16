@@ -9,148 +9,143 @@ grade: devel
 confinement: strict
 base: core18
 
+build-packages: [dirmngr]
+
 parts:
-
-  dart:
+  colcon:
     plugin: nil
     override-pull: |
-      set -x; apt remove dirmngr -y; apt install dirmngr --install-recommends -y
-      apt --yes install software-properties-common
-      apt-add-repository -yu ppa:dartsim/ppa
-      apt install -y \
-        dart6-data \
-        libdart6-dev \
-        libdart6-collision-ode-dev \
-        libdart6-external-odelcpsolver-dev \
-        libdart6-utils-urdf-dev
+      echo "deb http://packages.ros.org/ros/ubuntu bionic main" > /etc/apt/sources.list.d/ros-latest.list
+      apt-key adv --keyserver keyserver.ubuntu.com --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
+      apt-get update -qq && apt-get install -qq python3-vcstool python3-colcon-common-extensions
+      rm /etc/apt/sources.list.d/ros-latest.list && apt-get update -qq
 
-  ogre2:
+  ogre:
     plugin: nil
     override-pull: |
-      set -x; apt remove dirmngr -y; apt install dirmngr --install-recommends -y
-      apt --yes install software-properties-common
-      apt-key adv --fetch-keys http://packages.osrfoundation.org/gazebo.key
-      apt-add-repository -yu http://packages.osrfoundation.org/gazebo/ubuntu-stable
-      apt install -y libogre-1.9-dev libogre-2.1-dev
+      echo "deb http://packages.osrfoundation.org/gazebo/ubuntu-stable bionic main" > /etc/apt/sources.list.d/gazebo-stable.list
+      apt-key adv --keyserver keyserver.ubuntu.com --recv-key 67170598AF249743
+      apt-get update -qq && apt-get install -qq libogre-2.1-dev dart6-data libdart6-collision-ode-dev libdart6-dev libdart6-utils-urdf-dev
+      apt download libogre-2.1 libdart6 dart6-data libdart6-collision-ode libdart6-external-odelcpsolver liburdfdom-model libassimp4 libboost-filesystem1.65.1 libboost-regex1.65.1 libboost-system1.65.1 libccd2 libconsole-bridge0.4 libfcl0.5 libfreeimage3 libilmbase12 libjxr0 liboctomap1.8 libode6 libopenexr22 libraw16 libtinyxml2.6.2v5 libxaw7 libxmu6 libxpm4 libxrandr2 libxt6 libzzip-0-13
+      rm /etc/apt/sources.list.d/gazebo-stable.list && apt-get update -qq
+    override-build: |
+      for deb in *.deb; do dpkg -x "$deb" "$SNAPCRAFT_PART_INSTALL"; done
 
   ignition:
-    after: [dart, ogre2]
-    plugin: colcon
+    after: [colcon, ogre]
+    plugin: nil
     source: .
-    colcon-cmake-args:
-      - "-DBUILD_TESTING=OFF"
-      - "-DENABLE_TESTING=OFF"
-      - "-DKDE_INSTALL_USE_QT_SYS_PATHS=ON"
-      - "-DKDE_SKIP_TEST_SETTINGS=ON"
-    build-snaps:
-      - kde-frameworks-5-core18-sdk
-      - kde-frameworks-5-core18
     build-packages:
-      - make
-      - gcc
-      - g++
       - wget
       - git
-      - python3-vcstool
+      - build-essential
+      - cmake
+      - freeglut3-dev
       - libavcodec-dev
       - libavdevice-dev
       - libavformat-dev
       - libavutil-dev
+      - libbenchmark-dev
+      - libcurl4-openssl-dev
       - libfreeimage-dev
       - libgflags-dev
       - libglew-dev
       - libgts-dev
+      - libjsoncpp-dev
+      - libogre-1.9-dev
       - libprotobuf-dev
       - libprotoc-dev
+      - libqt5core5a
+      - libsqlite3-dev
       - libswscale-dev
-      - libtinyxml2-dev
       - libtinyxml-dev
+      - libtinyxml2-dev
+      - libwebsockets-dev
+      - libyaml-dev
+      - libzip-dev
+      - libzmq3-dev
       - pkg-config
       - protobuf-compiler
       - python
-      - ruby-dev
-      - uuid-dev
-      - libzip-dev
-      - libjsoncpp-dev
-      - libcurl4-openssl-dev
-      - libyaml-dev
-      - libzmq3-dev
-      - libsqlite3-dev
-      - libwebsockets-dev
-      - swig
+      - qml-module-qt-labs-folderlistmodel
+      - qml-module-qt-labs-settings
+      - qml-module-qtqml-models2
+      - qml-module-qtquick-controls
+      - qml-module-qtquick-controls2
+      - qml-module-qtquick-dialogs
+      - qml-module-qtquick-layouts
+      - qml-module-qtquick2
       - qtbase5-dev
       - qtdeclarative5-dev
       - qtquickcontrols2-5-dev
+      - ruby
+      - ruby-dev
+      - ruby-ronn
+      - swig
+      - uuid-dev
     stage-packages:
-      - libassimp4
-      - libboost-filesystem1.65.1
-      - libboost-regex1.65.1
-      - libboost-system1.65.1
-      - libboost-thread1.65.1
-      - libccd2
-      - libconsole-bridge0.4
-      - libev4
-      - libfcl0.5
+      - freeglut3
+      - libavcodec57
+      - libavcodec-extra57
+      - libavdevice57
+      - libavformat57
+      - libavutil55
+      - libbenchmark1
+      - libcurl4
       - libfreeimage3
+      - libgflags2.2
+      - libglew2.0
       - libgts-0.7-5
-      - libilmbase12
-      - libjxr0
-      - libnorm1
-      - liboctomap1.8
-      - libode6
-      - libopenexr22
-      - libpgm-5.2-0
-      - libprotobuf10
-      - libraw16
-      - libruby2.5
-      - libsodium23
-      - libtinyxml2-6
-      - libtinyxml2.6.2v5
-      - liburdfdom-model
-      - libwebsockets8
-      - libxaw7
-      - libxmu6
-      - libxpm4
-      - libxt6
-      - libzmq5
-      - libzzip-0-13
-      #
-      # libdart6* (non-dev) are available in both dartsim and OSRF ppa's but at different versions
-      # we install '-dev' versions to make sure that we have the same version at build/stage phases
-      - dart6-data
-      - libdart6-dev
-      - libdart6-utils-urdf-dev
-      - libdart6-collision-ode-dev
-      - libdart6-external-odelcpsolver-dev
-      #
+      - libjsoncpp1
       - libogre-1.9.0v5
-      - libogre-2.1
+      - libprotobuf10
+      - libprotoc10
+      - libsqlite3-0
+      - libswscale4
+      - libtinyxml2.6.2v5
+      - libtinyxml2-6
+      - libwebsockets8
+      - libyaml-0-2
+      - libzip4
+      - libzmq5
+      - python
+      - ruby
+      - ruby-ronn
+      - swig
+      - libuuid1
+      - libslang2
     override-pull: |
-      mkdir src && cd src
+      apt-get update -qq && apt-get install -qq g++-8
+      update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 800 --slave /usr/bin/g++ g++ /usr/bin/g++-8 --slave /usr/bin/gcov gcov /usr/bin/gcov-8
+
+      snapcraftctl pull
+      mkdir -p src && cd src
       if [ ! -f collection-citadel.yaml ]; then wget https://raw.githubusercontent.com/ignition-tooling/gazebodistro/master/collection-citadel.yaml; fi
       vcs import < collection-citadel.yaml
-      sed -i "s|\${CMAKE_INSTALL_PREFIX}|/snap/$SNAPCRAFT_PROJECT_NAME/current/opt/ros/snap|" ign-gazebo/include/ignition/gazebo/config.hh.in
-      sed -i "s|\${CMAKE_INSTALL_PREFIX}|/snap/$SNAPCRAFT_PROJECT_NAME/current/opt/ros/snap|" ign-gui/include/ignition/gui/config.hh.in
-      sed -i "s|IGN_RENDERING_PLUGIN_PATH|\"/snap/$SNAPCRAFT_PROJECT_NAME/current/opt/ros/snap/lib\"|" ign-rendering/src/RenderEngineManager.cc
+
+      sed -i "s|\${CMAKE_INSTALL_PREFIX}|/snap/$SNAPCRAFT_PROJECT_NAME/current|" ign-gazebo/include/ignition/gazebo/config.hh.in
+      sed -i "s|\${CMAKE_INSTALL_PREFIX}|/snap/$SNAPCRAFT_PROJECT_NAME/current|" ign-gui/include/ignition/gui/config.hh.in
+      sed -i "s|IGN_RENDERING_PLUGIN_PATH|\"/snap/$SNAPCRAFT_PROJECT_NAME/current/lib\"|" ign-rendering/src/RenderEngineManager.cc
+      sed -i "s|IGNITION_RENDERING_ENGINE_INSTALL_DIR|\"/snap/$SNAPCRAFT_PROJECT_NAME/current/lib/ign-rendering-3/engine-plugins\"|" ign-rendering/src/RenderEngineManager.cc
       sed -i "s|OGRE2_RESOURCE_PATH|\"/snap/$SNAPCRAFT_PROJECT_NAME/current/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/OGRE-2.1/OGRE\"|" ign-rendering/ogre2/src/Ogre2RenderEngine.cc
       sed -i "s|OGRE_RESOURCE_PATH|\"/snap/$SNAPCRAFT_PROJECT_NAME/current/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/OGRE-1.9.0\"|" ign-rendering/ogre/src/OgreRenderEngine.cc
-      sed -i "s|@IGN_SENSORS_PLUGIN_PATH@|/snap/$SNAPCRAFT_PROJECT_NAME/current/opt/ros/snap/lib|" ign-sensors/include/ignition/sensors/config.hh.in
+      sed -i "s|@IGN_SENSORS_PLUGIN_PATH@|/snap/$SNAPCRAFT_PROJECT_NAME/current/lib|" ign-sensors/include/ignition/sensors/config.hh.in
     override-build: |
       snapcraftctl build
-      for entry in "$SNAPCRAFT_PART_INSTALL/opt/ros/snap/share/ignition"/*.yaml; do
+      colcon build --cmake-args -DBUILD_TESTING=OFF --merge-install --install-base "$SNAPCRAFT_PART_INSTALL"
+      for entry in "$SNAPCRAFT_PART_INSTALL/share/ignition"/*.yaml; do
         sed -i "s|$SNAPCRAFT_PART_INSTALL|/snap/$SNAPCRAFT_PROJECT_NAME/current|" "$entry"
       done
 
 apps:
   ign:
     environment:
-      RUBYLIB: '$SNAP/usr/local/lib/site_ruby/2.5.0:$SNAP/usr/local/lib/$SNAPCRAFT_ARCH_TRIPLET/site_ruby:$SNAP/usr/local/lib/site_ruby:$SNAP/usr/lib/ruby/vendor_ruby/2.5.0:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/ruby/vendor_ruby/2.5.0:$SNAP/usr/lib/ruby/vendor_ruby:$SNAP/usr/lib/ruby/2.5.0:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/ruby/2.5.0'
+      RUBYLIB: '$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/ruby/2.5.0:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/ruby/vendor_ruby/2.5.0:$SNAP/usr/lib/ruby/2.5.0:$SNAP/usr/lib/ruby/vendor_ruby:$SNAP/lib/ruby'
       IGN_HOMEDIR: '$SNAP_USER_DATA'
-      IGN_CONFIG_PATH: '$SNAP/opt/ros/snap/share/ignition'
-      IGN_GUI_PLUGIN_PATH: '$SNAP/opt/ros/snap/lib/ign-gazebo-3/plugins'
-      IGN_RENDERING_PLUGIN_PATH: '$SNAP/opt/ros/snap/lib'
-      IGN_RENDERING_RESOURCE_PATH: '$SNAP/opt/ros/snap/share/ignition/ignition-rendering3'
-      IGN_GAZEBO_PHYSICS_ENGINE_PATH: '$SNAP/opt/ros/snap/lib/ign-physics-2/engine-plugins'
-    command: usr/bin/ruby $SNAP/opt/ros/snap/bin/ign
+      IGN_CONFIG_PATH: '$SNAP/share/ignition'
+      IGN_GUI_PLUGIN_PATH: '$SNAP/lib/ign-gui-3/plugins'
+      IGN_RENDERING_RESOURCE_PATH: '$SNAP/share/ignition/ignition-rendering3'
+      IGN_GAZEBO_PHYSICS_ENGINE_PATH: '$SNAP/lib/ign-physics-2/engine-plugins'
+    command: usr/bin/ruby $SNAP/bin/ign
     plugs: [network, network-bind, opengl, home]
     extensions: [kde-neon]
