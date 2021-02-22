@@ -119,8 +119,8 @@ parts:
       update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 800 --slave /usr/bin/g++ g++ /usr/bin/g++-8 --slave /usr/bin/gcov gcov /usr/bin/gcov-8
 
       snapcraftctl pull
-      mkdir -p src && cd src
-      if [ ! -f collection-citadel.yaml ]; then wget https://raw.githubusercontent.com/ignition-tooling/gazebodistro/master/collection-citadel.yaml; fi
+      rm -rf src && mkdir src && cd src
+      wget https://raw.githubusercontent.com/ignition-tooling/gazebodistro/master/collection-citadel.yaml
       vcs import < collection-citadel.yaml
 
       sed -i "s|\${CMAKE_INSTALL_PREFIX}|/snap/$SNAPCRAFT_PROJECT_NAME/current|" ign-gazebo/include/ignition/gazebo/config.hh.in
