@@ -1,0 +1,220 @@
+name: gazebo
+version: citadel
+summary: Simulate before you build.
+description: |
+  Gazebo (formerly known as Ignition [1]) is an open source robotics simulator maintained by Open Robotics [2].
+
+  Through Gazebo, users have access to high fidelity physics, rendering, and sensor models.
+  Additionally, users and developers have multiple points of entry to simulation,
+  including a graphical user interface, plugins, and asynchronous message passing and services.
+
+  Gazebo brings a fresh approach to simulation with a complete toolbox of development libraries and cloud services to make simulation easy.
+  Iterate fast on your new physical designs in realistic environments with high fidelity sensor streams.
+  Test control strategies in safety, and take advantage of simulation in continuous integration tests.
+
+  **Note**: This is a beta release, do expect bugs and limitations. If you encounter any, please do report it [3].
+
+  Installation Instructions:
+
+  * Install Gazebo from a terminal,
+
+  `snap install gazebo --edge`
+
+  * Test your installation,
+
+  `gazebo.gz gazebo shapes.sdf`
+
+  If you are following the Gazebo 'Getting Started' documentation, you can replace the entire 'Step 1: Install' with the snap command and resume at 'Step 2: Run'.
+
+  Learn more about Gazebo on the official website [4].
+
+  [1] https://community.gazebosim.org/t/a-new-era-for-gazebo/1356
+
+  [2] https://openrobotics.org/
+
+  [3] https://github.com/canonical/ignition_snap
+
+  [4] https://ignitionrobotics.org/home
+
+issues: https://github.com/canonical/ignition_snap
+source-code: https://github.com/canonical/ignition_snap
+license: Apache-2.0
+
+grade: devel
+confinement: strict
+base: core20
+
+# The 'kde-neon' extension is only supported for amd64 atm.
+# Gazebo support for arm64 is 'best-effort'
+architectures: [amd64]
+
+package-repositories:
+  # For dart/ogre
+  - components: [main]
+    formats: [deb]
+    key-id: D2486D2DD83DB69272AFE98867170598AF249743
+    key-server: keyserver.ubuntu.com
+    suites: [focal]
+    type: apt
+    url: http://packages.osrfoundation.org/gazebo/ubuntu-stable
+
+parts:
+  gazebo:
+    after: [kde-neon-extension]
+    plugin: colcon
+    source: .
+    colcon-cmake-args:
+      - "-DBUILD_TESTING=OFF"
+      - "-DBUILD_DOCS=OFF"
+      - "-DCMAKE_BUILD_TYPE=Release"
+      - "-DCMAKE_C_COMPILER_LAUNCHER=ccache"
+      - "-DCMAKE_CXX_COMPILER_LAUNCHER=ccache"
+      - "-DSKIP_usd=true"
+      - "-DSKIP_optix=true"
+      # We skip RPATH to hide warnings regarding libraries that are available at two different places, preventing a safe RPATH generation
+      - "-DCMAKE_SKIP_RPATH=TRUE"
+      - "${SNAPCRAFT_CMAKE_ARGS}"
+      - "--event-handlers=console_direct+"
+    build-environment:
+      - IGNITION_VERSION: citadel
+    build-packages:
+      - wget
+      - git
+      - python3-vcstool
+      - ccache
+      - binutils-dev
+      - build-essential
+      - cmake
+      - curl
+      - freeglut3-dev
+      - libavdevice-dev
+      - libbenchmark-dev
+      - libcurl4-openssl-dev
+      - libdart-collision-bullet-dev
+      - libdart-collision-ode-dev
+      - libdart-dev
+      - libdart-external-ikfast-dev
+      - libdart-external-odelcpsolver-dev
+      - libdart-utils-urdf-dev
+      - libeigen3-dev
+      - libfreeimage-dev
+      - libgflags-dev
+      - libglew-dev
+      - libgts-dev
+      - libjsoncpp-dev
+      - libogre-1.9-dev
+      - libogre-2.1-dev
+      - libprotobuf-dev
+      - libprotoc-dev
+      - libsqlite3-dev
+      - libtinyxml2-dev
+      - liburdfdom-dev
+      - libwebsockets-dev
+      - libxi-dev
+      - libxml2-utils
+      - libxmu-dev
+      - libyaml-dev
+      - libzip-dev
+      - libzmq3-dev
+      - pkg-config
+      - protobuf-compiler
+      - python3-distutils
+      - python3-psutil
+      - python3-pybind11
+      - python-yaml
+      - rubocop
+      - ruby
+      - ruby-dev
+      - ruby-ronn
+      - swig
+      - uuid-dev
+      - xvfb
+
+    stage-packages:
+      - libcurl4
+      - libyaml-dev
+      - libjsoncpp1
+      - libassimp5
+      - libboost-regex1.71.0
+      - libboost-thread1.71.0
+      - libccd2
+      - libconsole-bridge0.4
+      - libev4
+      - libfcl0.5
+      - libfreeimage3
+      - libbinutils
+      - libgts-0.7-5
+      - libilmbase24
+      - libjxr0
+      - libnorm1
+      - liboctomap1.9
+      - libode8
+      - libopenexr24
+      - libpgm-5.2-0
+      - libprotobuf17
+      - libraw19
+      - libruby2.7
+      - libsodium23
+      - libtinyxml2-6a
+      - libtinyxml2.6.2v5
+      - liburdfdom-model
+      - libwebsockets15
+      - libxaw7
+      - libxmu6
+      - libxpm4
+      - libzmq5
+      - libdart6
+      - libdart6-collision-bullet
+      - libdart6-collision-ode
+      - libdart6-external-odelcpsolver
+      - libogre-1.9.0v5
+      - libogre-2.1
+      - ros-foxy-ros-environment
+      - ros-foxy-ros2-controllers
+
+    override-pull: |
+      snapcraftctl pull
+      if [ ! -f collection-citadel.yaml ]; then wget https://raw.githubusercontent.com/ignition-tooling/gazebodistro/master/collection-citadel.yaml; fi
+      vcs import < collection-citadel.yaml
+      vcs import < ros2-controllers.yaml
+
+      # delete the directory since we don't want rosdep to pull the deps
+      rm -rf ign_ros2_control/ign_ros2_control_demos
+
+      # place artifical package.xml files in ign directories
+      ls ign_packages_XML | awk -F. '{print $1}' | awk '{printf("mv ign_packages_XML/%s.xml %s/package.xml\n", $1, $1)}' | sh
+
+      sed -i "s|\${CMAKE_INSTALL_PREFIX}|/snap/$SNAPCRAFT_PROJECT_NAME/current/opt/ros/snap|" ign-gazebo/include/ignition/gazebo/config.hh.in
+      sed -i "s|\${CMAKE_INSTALL_PREFIX}|/snap/$SNAPCRAFT_PROJECT_NAME/current/opt/ros/snap|" ign-gui/include/ignition/gui/config.hh.in
+      sed -i "s|IGN_RENDERING_PLUGIN_PATH|\"/snap/$SNAPCRAFT_PROJECT_NAME/current/opt/ros/snap/lib\"|" ign-rendering/src/RenderEngineManager.cc
+      sed -i "s|OGRE2_RESOURCE_PATH|\"/snap/$SNAPCRAFT_PROJECT_NAME/current/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/OGRE-2.1/OGRE\"|" ign-rendering/ogre2/src/Ogre2RenderEngine.cc
+      sed -i "s|OGRE_RESOURCE_PATH|\"/snap/$SNAPCRAFT_PROJECT_NAME/current/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/OGRE-1.9.0\"|" ign-rendering/ogre/src/OgreRenderEngine.cc
+      sed -i "s|@IGN_SENSORS_PLUGIN_PATH@|/snap/$SNAPCRAFT_PROJECT_NAME/current/opt/ros/snap/lib|" ign-sensors/include/ignition/sensors/config.hh.in
+      sed -i 's|\${IGNITION_RENDERING_ENGINE_INSTALL_DIR}|/snap/$SNAPCRAFT_PROJECT_NAME/current/opt/ros/snap/lib/ign-rendering-3/engine-plugins|' ign-rendering/include/ignition/rendering/config.hh.in
+
+      sed -i 's|<depend>ignition-plugin<\/depend>|<build_depend>ignition-plugin1<\/build_depend>|' ign_ros2_control/ign_ros2_control/package.xml
+      sed -i '/ignition-.*<\/depend/s/depend/build_depend/g' ign_ros2_control/ign_ros2_control/package.xml
+
+    override-build: |
+      snapcraftctl build
+      for entry in "$SNAPCRAFT_PART_INSTALL/opt/ros/snap/share/ignition"/*.yaml; do
+        sed -i "s|$SNAPCRAFT_PART_INSTALL|/snap/$SNAPCRAFT_PROJECT_NAME/current|" "$entry"
+      done
+
+apps:
+
+  # We're not creating the `gazebo` app just yet has this could conflict
+  # with a (non-Ignition) Gazebo prior install.
+
+  gz:
+    environment:
+      RUBYLIB: '$SNAP/usr/local/lib/site_ruby/2.7.0:$SNAP/usr/local/lib/$SNAPCRAFT_ARCH_TRIPLET/site_ruby:$SNAP/usr/local/lib/site_ruby:$SNAP/usr/lib/ruby/vendor_ruby/2.7.0:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/ruby/vendor_ruby/2.7.0:$SNAP/usr/lib/ruby/vendor_ruby:$SNAP/usr/lib/ruby/2.7.0:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/ruby/2.7.0'
+      IGN_HOMEDIR: '$SNAP_USER_DATA'
+      IGN_CONFIG_PATH: '$SNAP/opt/ros/snap/share/ignition'
+      IGN_RENDERING_RESOURCE_PATH: '$SNAP/opt/ros/snap/share/ignition/ignition-rendering3'
+      IGN_GAZEBO_PHYSICS_ENGINE_PATH: '$SNAP/opt/ros/snap/lib/ign-physics-2/engine-plugins'
+      OGRE2_RESOURCE_PATH: '$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/OGRE-2.1/OGRE'
+      OGRE_RESOURCE_PATH: '$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/OGRE-1.9.0'
+    command: usr/bin/ruby $SNAP/opt/ros/snap/bin/ign
+    plugs: [network, network-bind, home]
+    extensions: [kde-neon, ros2-foxy]

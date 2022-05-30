@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>ignition-physics2</name>
+  <version>2.5.0</version>
+  <description>WIP</description>
+  <maintainer email="wip@wip.com">WIP</maintainer>
+  <author>WIP</author>
+  <license>WIP</license>
+
+  <build_depend>ignition-cmake2</build_depend>
+  <build_depend>ignition-common3</build_depend>
+  <build_depend>ignition-math6</build_depend>
+  <build_depend>ignition-plugin1</build_depend>
+  <build_depend>sdformat9</build_depend>
+
+</package>

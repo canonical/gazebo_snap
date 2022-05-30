@@ -1,0 +1,36 @@
+name: snap
+on:
+  push:
+    branches:
+      - citadel
+      - fortress
+  pull_request:
+    branches:
+      - citadel
+      - fortress
+  workflow_dispatch:
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: snapcore/action-build@v1
+      id: build-snap
+      with:
+        snapcraft-args: '--enable-experimental-extensions'
+
+    # Make sure the snap is installable
+    - run: |
+        sudo snap install --dangerous ${{ steps.snapcraft.outputs.snap }}
+
+    # @todo Do some testing with the snap
+    - run: |
+        gazebo.ign gazebo --versions
+
+    # - uses: snapcore/action-publish@v1
+    #   with:
+    #     store_login: ${{ secrets.STORE_LOGIN }}
+    #     snap: ${{ steps.build-snap.outputs.snap }}
+    #     release: edge
