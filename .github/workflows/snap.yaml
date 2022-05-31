@@ -10,7 +10,6 @@ on:
       - fortress
   workflow_dispatch:
 
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -23,7 +22,7 @@ jobs:
 
     # Make sure the snap is installable
     - run: |
-        sudo snap install --dangerous ${{ steps.snapcraft.outputs.snap }}
+        sudo snap install --dangerous ${{ steps.build-snap.outputs.snap }}
 
     # @todo Do some testing with the snap
     - run: |
