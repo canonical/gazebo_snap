@@ -26,7 +26,7 @@ jobs:
 
     # @todo Do some testing with the snap
     - run: |
-        gazebo.ign gazebo --versions
+        gazebo.gz gazebo --version
 
     # - uses: snapcore/action-publish@v1
     #   with:
