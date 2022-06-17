@@ -235,3 +235,17 @@ apps:
         FASTRTPS_DEFAULT_PROFILES_FILE: ${SNAP}/usr/share/fastdds_no_shared_memory.xml
     plugs: [network, network-bind, home]
     extensions: [ros2-foxy]
+
+  ros-gz-parameter-bridge:
+    command: opt/ros/foxy/bin/ros2 run ros_ign_bridge parameter_bridge
+    environment:
+        FASTRTPS_DEFAULT_PROFILES_FILE: ${SNAP}/usr/share/fastdds_no_shared_memory.xml
+    plugs: [network, network-bind, home]
+    extensions: [ros2-foxy]
+
+  ros-gz-static-bridge:
+    command: opt/ros/foxy/bin/ros2 run ros_ign_bridge static_bridge
+    environment:
+        FASTRTPS_DEFAULT_PROFILES_FILE: ${SNAP}/usr/share/fastdds_no_shared_memory.xml
+    plugs: [network, network-bind, home]
+    extensions: [ros2-foxy]
