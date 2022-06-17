@@ -73,7 +73,7 @@ parts:
       - "-DSKIP_optix=true"
       # We skip RPATH to hide warnings regarding libraries that are available at two different places, preventing a safe RPATH generation
       - "-DCMAKE_SKIP_RPATH=TRUE"
-      - "${SNAPCRAFT_CMAKE_ARGS}"
+      - "-DCMAKE_PREFIX_PATH=/snap/kde-frameworks-5-91-qt-5-15-3-core20-sdk/current/usr/lib/x86_64-linux-gnu/cmake/Qt5"
       - "--event-handlers=console_direct+"
     build-environment:
       - IGNITION_VERSION: citadel
@@ -176,10 +176,15 @@ parts:
       snapcraftctl pull
       if [ ! -f collection-citadel.yaml ]; then wget https://raw.githubusercontent.com/ignition-tooling/gazebodistro/master/collection-citadel.yaml; fi
       vcs import < collection-citadel.yaml
-      vcs import < ros2-controllers.yaml
+      vcs import < ros2-ign.yaml
 
       # delete the directory since we don't want rosdep to pull the deps
       rm -rf ign_ros2_control/ign_ros2_control_demos
+
+      # delete the directory since we don't want rosdep to pull the deps
+      rm -rf ros_gz/ros_ign_gazebo_demos
+      # temporary, it depends on some odds version of ign libs, https://github.com/gazebosim/ros_gz/issues/40
+      rm -rf ros_gz/ros_ign_point_cloud
 
       # place artifical package.xml files in ign directories
       ls ign_packages_XML | awk -F. '{print $1}' | awk '{printf("mv ign_packages_XML/%s.xml %s/package.xml\n", $1, $1)}' | sh
@@ -192,8 +197,12 @@ parts:
       sed -i "s|@IGN_SENSORS_PLUGIN_PATH@|/snap/$SNAPCRAFT_PROJECT_NAME/current/opt/ros/snap/lib|" ign-sensors/include/ignition/sensors/config.hh.in
       sed -i 's|\${IGNITION_RENDERING_ENGINE_INSTALL_DIR}|/snap/$SNAPCRAFT_PROJECT_NAME/current/opt/ros/snap/lib/ign-rendering-3/engine-plugins|' ign-rendering/include/ignition/rendering/config.hh.in
 
+      # artificial ign package.xml are not "installed" so rosdep try to redownload them
       sed -i 's|<depend>ignition-plugin<\/depend>|<build_depend>ignition-plugin1<\/build_depend>|' ign_ros2_control/ign_ros2_control/package.xml
       sed -i '/ignition-.*<\/depend/s/depend/build_depend/g' ign_ros2_control/ign_ros2_control/package.xml
+      find ros_gz -name package.xml -exec sed -i '/ignition-.*<\/depend/s/depend/build_depend/g' {} \;
+
+      sed -i '/ros_ign_gazebo_demos/d' ros_gz/ros_ign/package.xml
 
     override-build: |
       snapcraftctl build
@@ -215,6 +224,14 @@ apps:
       IGN_GAZEBO_PHYSICS_ENGINE_PATH: '$SNAP/opt/ros/snap/lib/ign-physics-2/engine-plugins'
       OGRE2_RESOURCE_PATH: '$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/OGRE-2.1/OGRE'
       OGRE_RESOURCE_PATH: '$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/OGRE-1.9.0'
+      IGN_GAZEBO_SYSTEM_PLUGIN_PATH: '$SNAP/opt/ros/snap/lib'
     command: usr/bin/ruby $SNAP/opt/ros/snap/bin/ign
     plugs: [network, network-bind, home]
     extensions: [kde-neon, ros2-foxy]
+
+  ros-gz-create:
+    command: opt/ros/foxy/bin/ros2 run ros_ign_gazebo create
+    environment:
+        FASTRTPS_DEFAULT_PROFILES_FILE: ${SNAP}/usr/share/fastdds_no_shared_memory.xml
+    plugs: [network, network-bind, home]
+    extensions: [ros2-foxy]
