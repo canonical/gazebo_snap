@@ -210,6 +210,12 @@ parts:
         sed -i "s|$SNAPCRAFT_PART_INSTALL|/snap/$SNAPCRAFT_PROJECT_NAME/current|" "$entry"
       done
 
+  fastdds-no-shared-memory:
+    plugin: dump
+    source: snap/local/
+    organize:
+      'fastdds_no_shared_memory.xml': usr/share/
+
 apps:
 
   # We're not creating the `gazebo` app just yet has this could conflict
