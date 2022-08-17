@@ -174,7 +174,7 @@ parts:
 
     override-pull: |
       snapcraftctl pull
-      if [ ! -f collection-citadel.yaml ]; then wget https://raw.githubusercontent.com/ignition-tooling/gazebodistro/master/collection-citadel.yaml; fi
+      if [ ! -f collection-citadel.yaml ]; then wget https://raw.githubusercontent.com/gazebo-tooling/gazebodistro/master/collection-citadel.yaml; fi
       vcs import < collection-citadel.yaml
       vcs import < ros2-ign.yaml
 
