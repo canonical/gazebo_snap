@@ -1,10 +1,13 @@
 <?xml version="1.0"?>
 <package format="3">
-  <name>ignition-tools</name>
-  <version>1.4.1</version>
+  <name>gazebo-common3</name>
+  <version>3.14.0</version>
   <description>WIP</description>
   <maintainer email="wip@wip.com">WIP</maintainer>
   <author>WIP</author>
   <license>WIP</license>
+
+  <build_depend>gazebo-cmake2</build_depend>
+  <build_depend>gazebo-math6</build_depend>
 
 </package>

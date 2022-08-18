@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>gazebo-rendering3</name>
+  <version>3.6.0</version>
+  <description>WIP</description>
+  <maintainer email="wip@wip.com">WIP</maintainer>
+  <author>WIP</author>
+  <license>WIP</license>
+
+  <build_depend>gazebo-cmake2</build_depend>
+  <build_depend>gazebo-common3</build_depend>
+  <build_depend>gazebo-math6</build_depend>
+  <build_depend>gazebo-plugin1</build_depend>
+
+</package>

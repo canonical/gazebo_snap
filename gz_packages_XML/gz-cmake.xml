@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <package format="3">
-  <name>ignition-plugin1</name>
-  <version>1.2.1</version>
+  <name>gazebo-cmake2</name>
+  <version>2.12.1</version>
   <description>WIP</description>
   <maintainer email="wip@wip.com">WIP</maintainer>
   <author>WIP</author>
   <license>WIP</license>
 
-  <build_depend>ignition-cmake2</build_depend>
+  <build_depend>gazebo-tools</build_depend>
 
 </package>

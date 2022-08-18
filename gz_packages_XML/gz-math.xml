@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <package format="3">
-  <name>ignition-math6</name>
+  <name>gazebo-math6</name>
   <version>6.10.0</version>
   <description>WIP</description>
   <maintainer email="wip@wip.com">WIP</maintainer>
   <author>WIP</author>
   <license>WIP</license>
 
-  <build_depend>ignition-cmake2</build_depend>
+  <build_depend>gazebo-cmake2</build_depend>
 
 </package>
