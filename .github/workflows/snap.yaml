@@ -49,4 +49,4 @@ jobs:
         SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.STORE_LOGIN }}
       with:
         snap: ${{ needs.build.outputs.snap-file }}
-        release: edge
+        release: citadel/edge
