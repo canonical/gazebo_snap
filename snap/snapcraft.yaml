@@ -73,7 +73,7 @@ parts:
       - "-DSKIP_optix=true"
       # We skip RPATH to hide warnings regarding libraries that are available at two different places, preventing a safe RPATH generation
       - "-DCMAKE_SKIP_RPATH=TRUE"
-      - "-DCMAKE_PREFIX_PATH=$(echo $SNAPCRAFT_CMAKE_ARGS | awk -F= '{printf(\"%s/usr/lib/x86_64-linux-gnu/cmake/Qt5\", $2)}')"
+      - "-DCMAKE_PREFIX_PATH=$(echo $SNAPCRAFT_CMAKE_ARGS | awk -F= '{printf(\"%s/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/cmake/Qt5\", $2)}')"
       - "--event-handlers=console_direct+"
     build-environment:
       - IGNITION_VERSION: citadel
