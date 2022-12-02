@@ -190,7 +190,7 @@ parts:
       ls gz_packages_XML | awk -F. '{printf("mv gz_packages_XML/%s.xml %s/package.xml\n", $1, $1)}' | sh
 
       sed -i "s|\${CMAKE_INSTALL_PREFIX}|/snap/$SNAPCRAFT_PROJECT_NAME/current/opt/ros/snap|" gz-sim/include/ignition/gazebo/config.hh.in
-      sed -i "s|\${CMAKE_INSTALL_PREFIX}|/snap/$SNAPCRAFT_PROJECT_NAME/current/opt/ros/snap|" gz-gui/include/ignition/gui/config.hh.in
+      sed -i "s|\${CMAKE_INSTALL_PREFIX}|/snap/$SNAPCRAFT_PROJECT_NAME/current/opt/ros/snap|" gz-gui/include/gz/gui/config.hh.in
       sed -i "s|IGN_RENDERING_PLUGIN_PATH|\"/snap/$SNAPCRAFT_PROJECT_NAME/current/opt/ros/snap/lib\"|" gz-rendering/src/RenderEngineManager.cc
       sed -i "s|OGRE2_RESOURCE_PATH|\"/snap/$SNAPCRAFT_PROJECT_NAME/current/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/OGRE-2.1/OGRE\"|" gz-rendering/ogre2/src/Ogre2RenderEngine.cc
       sed -i "s|OGRE_RESOURCE_PATH|\"/snap/$SNAPCRAFT_PROJECT_NAME/current/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/OGRE-1.9.0\"|" gz-rendering/ogre/src/OgreRenderEngine.cc
