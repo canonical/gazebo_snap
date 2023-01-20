@@ -225,6 +225,16 @@ parts:
     source: snap/local
     build-packages: [fd-find]
     override-prime: |
+      KDE_CONTENT_SNAP=$(echo $SNAPCRAFT_CMAKE_ARGS | sed -n 's/.*\/snap\/\(.*\)-sdk.*/\1/p')
+      # Remove duplicated files available in content snap
+      for snap in "core20" $KDE_CONTENT_SNAP; do  # List all content-snaps and base snaps you're using here
+          snap install $snap
+          # We don't delete symlink
+          cd "/snap/$snap/current" && fdfind . --type f --exec rm -f "$SNAPCRAFT_PRIME/{}" \;
+          # We delete symlink pointing to nowhere
+          find "$SNAPCRAFT_PRIME" -xtype l -delete
+      done
+
       # remove every header and source file
       fdfind --type file --type symlink '.*\.(hpp|hxx|h|hh|cpp|cxx|c|cc)$' $SNAPCRAFT_PRIME  --exec rm {}
       # remove every cmake file
