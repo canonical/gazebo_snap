@@ -219,6 +219,23 @@ parts:
     organize:
       'fastdds_no_shared_memory.xml': usr/share/
 
+  cleanup:
+    after: [gazebo, ros2-foxy-extension]
+    plugin: nil
+    build-packages: [fd-find] # installing fd-find and run it once is usually faster than calling find once
+    override-prime: |
+      #### remove content sharing snap duplicate
+      KDE_CONTENT_SNAP=$(echo $SNAPCRAFT_CMAKE_ARGS | sed -n 's/.*\/snap\/\(.*\)-sdk.*/\1/p')
+      # remove duplicated files available in content snap
+      for snap in "core20" $KDE_CONTENT_SNAP; do  # list all content-snaps and base snaps you're using here
+          snap install $snap
+          # we don't delete symlink
+          cd "/snap/$snap/current/" && fdfind . --type f --exec rm -f "$SNAPCRAFT_PRIME/{}" \;
+          # we delete symlink pointing to nowhere
+          find "$SNAPCRAFT_PRIME" -xtype l -delete
+      done
+      ####
+
 apps:
 
   # We're not creating the `gazebo` app just yet has this could conflict
