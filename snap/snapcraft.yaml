@@ -59,6 +59,11 @@ package-repositories:
     type: apt
     url: http://packages.osrfoundation.org/gazebo/ubuntu-stable
 
+
+layout:
+  /etc/ld.so.cache:
+    bind-file: $SNAP_DATA/etc/ld.so.cache
+
 parts:
   gazebo:
     after: [kde-neon-extension]
@@ -286,6 +291,20 @@ parts:
       remove-apt-package-with-prefix python3-rosdep
       remove-apt-package-with-prefix cmake
 
+
+  ld-cache:
+    after: [kde-neon-extension]
+    plugin: nil
+    source: snap/local
+    override-build: |
+      KDE_CONTENT_SNAP=$(echo $SNAPCRAFT_CMAKE_ARGS | sed -n 's/.*\/snap\/\(.*\)-sdk.*/\1/p')
+      mkdir $SNAPCRAFT_PART_INSTALL/bin
+      cp *.sh $SNAPCRAFT_PART_INSTALL/bin
+      mkdir -p $SNAPCRAFT_PART_INSTALL/snap/hooks
+      ln -s ../../bin/hook.sh $SNAPCRAFT_PART_INSTALL/snap/hooks/post-refresh
+      ln -s ../../bin/hook.sh $SNAPCRAFT_PART_INSTALL/snap/hooks/connect-plug-$KDE_CONTENT_SNAP
+      ln -s ../../bin/hook.sh $SNAPCRAFT_PART_INSTALL/snap/hooks/disconnect-plug-$KDE_CONTENT_SNAP
+
 apps:
 
   # We're not creating the `gazebo` app just yet has this could conflict
@@ -301,6 +320,7 @@ apps:
       OGRE2_RESOURCE_PATH: '$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/OGRE-2.1/OGRE'
       OGRE_RESOURCE_PATH: '$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/OGRE-1.9.0'
       IGN_GAZEBO_SYSTEM_PLUGIN_PATH: '$SNAP/opt/ros/snap/lib'
+    command-chain: [bin/check-ld-cache.sh]
     command: usr/bin/ruby $SNAP/opt/ros/snap/bin/ign
     plugs: [network, network-bind, home]
     extensions: [kde-neon, ros2-foxy]
