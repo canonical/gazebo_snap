@@ -291,6 +291,9 @@ parts:
       remove-apt-package-with-prefix python3-rosdep
       remove-apt-package-with-prefix cmake
 
+      # remove every file not listed as necessary
+      find $SNAPCRAFT_PRIME -type f -not -path "$SNAPCRAFT_PRIME/meta/*" -not -path "$SNAPCRAFT_PRIME/snap/*" -not -path "$SNAPCRAFT_PRIME/opt/ros/snap/share/ignition/ignition-rendering3/ogre2/media/*" | sort | comm -23 - /root/project/snap/local/necessary_files.txt | xargs rm -rf
+
 
   ld-cache:
     after: [kde-neon-extension]
