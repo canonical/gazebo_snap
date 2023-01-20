@@ -45,3 +45,6 @@ Try the following before launching Gazebo,
 ```bash
 unset SESSION_MANAGER
 ```
+## Benchmarking
+the script `startup-time.sh` is used to measure "cold" and "warn" start of the snap. The script will append the results of the experiment in a file giving for both cases the sum of total number of CPU-seconds that the process used directly (in user mode) and total number of CPU-seconds used by the system on behalf of the process (in kernel mode), in seconds to depend as little as possible on the load of the computer. The file is saved at `~/startup-time-results.txt`
+
