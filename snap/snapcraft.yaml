@@ -219,6 +219,31 @@ parts:
     organize:
       'fastdds_no_shared_memory.xml': usr/share/
 
+  cleanup:
+    after: [gazebo, ros2-foxy-extension]
+    plugin: nil
+    source: snap/local
+    build-packages: [fd-find]
+    override-prime: |
+      # remove every header and source file
+      fdfind --type file --type symlink '.*\.(hpp|hxx|h|hh|cpp|cxx|c|cc)$' $SNAPCRAFT_PRIME  --exec rm {}
+      # remove every cmake file
+      fdfind --type file --type symlink '(.cmake|CMakeLists.txt)$' $SNAPCRAFT_PRIME  --exec rm {}
+      # remove every test(s) directories
+      fdfind --type directory "^tests?$" $SNAPCRAFT_PRIME --exec rm -rf {}
+      # remove every example(s) directories
+      fdfind --type directory "^examples?$" $SNAPCRAFT_PRIME --exec rm -rf {}
+      # remove man files
+      rm -rf $SNAPCRAFT_PRIME/usr/share/man
+      # remove doc files
+      rm -rf $SNAPCRAFT_PRIME/usr/share/doc
+      # remove perl share files
+      rm -rf $SNAPCRAFT_PRIME/usr/share/perl
+      # remove /usr/src/
+      rm -rf $SNAPCRAFT_PRIME/usr/src
+      # remove additional sources
+      rm -rf $SNAPCRAFT_PRIME/opt/ros/foxy/src/
+
 apps:
 
   # We're not creating the `gazebo` app just yet has this could conflict
