@@ -1,5 +1,5 @@
 name: gazebo
-version: citadel
+version: fortress
 summary: Simulate before you build.
 description: |
   Gazebo (formerly known as Ignition [1]) is an open source robotics simulator maintained by Open Robotics [2].
@@ -42,7 +42,7 @@ license: Apache-2.0
 
 grade: devel
 confinement: strict
-base: core20
+base: core22
 
 # The 'kde-neon' extension is only supported for amd64 atm.
 # Gazebo support for arm64 is 'best-effort'
@@ -60,7 +60,7 @@ package-repositories:
 
 parts:
   gazebo:
-    after: [kde-neon-extension]
+    #after: [kde-neon-extension] why is this not compliant?
     plugin: colcon
     source: .
     colcon-cmake-args:
@@ -76,7 +76,8 @@ parts:
       - "-DCMAKE_PREFIX_PATH=$(echo $SNAPCRAFT_CMAKE_ARGS | awk -F= '{printf(\"%s/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/cmake/Qt5\", $2)}')"
       - "--event-handlers=console_direct+"
     build-environment:
-      - IGNITION_VERSION: citadel
+      - IGNITION_VERSION: fortress
+      - GZ_VERSION: fortress
     build-packages:
       - wget
       - git
@@ -103,7 +104,7 @@ parts:
       - libgts-dev
       - libjsoncpp-dev
       - libogre-1.9-dev
-      - libogre-2.1-dev
+      - libogre-2.2-dev
       - libprotobuf-dev
       - libprotoc-dev
       - libsqlite3-dev
@@ -121,7 +122,7 @@ parts:
       - python3-distutils
       - python3-psutil
       - python3-pybind11
-      - python-yaml
+      - python3-yaml
       - rubocop
       - ruby
       - ruby-dev
@@ -133,44 +134,47 @@ parts:
     stage-packages:
       - libcurl4
       - libyaml-dev
-      - libjsoncpp1
+      - libjsoncpp25
       - libassimp5
-      - libboost-regex1.71.0
-      - libboost-thread1.71.0
+      - libboost-regex1.74.0
+      - libboost-thread1.74.0
+      - libboost-iostreams1.74.0
+      - libboost-program-options1.74.0
+      - libboost-filesystem1.74.0
       - libccd2
-      - libconsole-bridge0.4
+      - libconsole-bridge1.0
       - libev4
-      - libfcl0.5
+      - libfcl0.7
       - libfreeimage3
       - libbinutils
       - libgts-0.7-5
-      - libilmbase24
+      - libilmbase25
       - libjxr0
       - libnorm1
       - liboctomap1.9
       - libode8
-      - libopenexr24
-      - libpgm-5.2-0
-      - libprotobuf17
-      - libraw19
-      - libruby2.7
+      - libopenexr25
+      - libpgm-5.3-0
+      - libprotobuf23
+      - libraw20
+      - libruby3.0
       - libsodium23
-      - libtinyxml2-6a
+      - libtinyxml2-9
       - libtinyxml2.6.2v5
-      - liburdfdom-model
-      - libwebsockets15
+      - liburdfdom-model3.0
+      - libwebsockets16
       - libxaw7
       - libxmu6
       - libxpm4
       - libzmq5
-      - libdart6
-      - libdart6-collision-bullet
-      - libdart6-collision-ode
-      - libdart6-external-odelcpsolver
+      - libdart6.12
+      - libdart-collision-bullet6.12
+      - libdart-collision-ode6.12
+      - libdart-external-odelcpsolver6.12
       - libogre-1.9.0v5
-      - libogre-2.1
-      - ros-foxy-ros-environment
-      - ros-foxy-ros2-controllers
+      - libogre-2.2
+      - ros-humble-ros-environment
+      - ros-humble-ros2-controllers
 
     override-pull: |
       craftctl default
@@ -189,7 +193,7 @@ parts:
       'fastdds_no_shared_memory.xml': usr/share/
 
   cleanup:
-    after: [gazebo, ros2-foxy-extension]
+    after: [gazebo, ros2-humble-extension]
     plugin: nil
     build-packages: [fd-find] # installing fd-find and run it once is usually faster than calling find once
     override-prime: |
@@ -202,7 +206,7 @@ apps:
 
   gz:
     environment:
-      RUBYLIB: '$SNAP/usr/local/lib/site_ruby/2.7.0:$SNAP/usr/local/lib/$SNAPCRAFT_ARCH_TRIPLET/site_ruby:$SNAP/usr/local/lib/site_ruby:$SNAP/usr/lib/ruby/vendor_ruby/2.7.0:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/ruby/vendor_ruby/2.7.0:$SNAP/usr/lib/ruby/vendor_ruby:$SNAP/usr/lib/ruby/2.7.0:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/ruby/2.7.0'
+      RUBYLIB: '$SNAP/usr/local/lib/site_ruby/3.0.0:$SNAP/usr/local/lib/$SNAPCRAFT_ARCH_TRIPLET/site_ruby:$SNAP/usr/local/lib/site_ruby:$SNAP/usr/lib/ruby/vendor_ruby/3.0.0:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/ruby/vendor_ruby/3.0.0:$SNAP/usr/lib/ruby/vendor_ruby:$SNAP/usr/lib/ruby/3.0.0:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/ruby/3.0.0'
       IGN_HOMEDIR: '$SNAP_USER_DATA'
       IGN_CONFIG_PATH: '$SNAP/opt/ros/snap/share/ignition'
       IGN_RENDERING_RESOURCE_PATH: '$SNAP/opt/ros/snap/share/ignition/ignition-rendering3'
@@ -212,18 +216,18 @@ apps:
       IGN_GAZEBO_SYSTEM_PLUGIN_PATH: '$SNAP/opt/ros/snap/lib'
     command: usr/bin/ruby $SNAP/opt/ros/snap/bin/ign
     plugs: [network, network-bind, home]
-    extensions: [kde-neon, ros2-foxy]
+    extensions: [kde-neon, ros2-humble]
 
   ros-gz-create:
-    command: opt/ros/foxy/bin/ros2 run ros_ign_gazebo create
+    command: opt/ros/humble/bin/ros2 run ros_ign_gazebo create
     environment:
         FASTRTPS_DEFAULT_PROFILES_FILE: ${SNAP}/usr/share/fastdds_no_shared_memory.xml
     plugs: [network, network-bind, home]
-    extensions: [ros2-foxy]
+    extensions: [ros2-humble]
 
   ros-gz-bridge:
-    command: opt/ros/foxy/bin/ros2 run ros_ign_bridge
+    command: opt/ros/humble/bin/ros2 run ros_ign_bridge
     environment:
         FASTRTPS_DEFAULT_PROFILES_FILE: ${SNAP}/usr/share/fastdds_no_shared_memory.xml
     plugs: [network, network-bind, home]
-    extensions: [ros2-foxy]
+    extensions: [ros2-humble]
