@@ -173,42 +173,11 @@ parts:
       - ros-foxy-ros2-controllers
 
     override-pull: |
-      snapcraftctl pull
-      if [ ! -f collection-citadel.yaml ]; then wget https://raw.githubusercontent.com/gazebo-tooling/gazebodistro/master/collection-citadel.yaml; fi
-      vcs import < collection-citadel.yaml
-      vcs import < ros2-ign.yaml
-
-      # delete the directory since we don't want rosdep to pull the deps
-      rm -rf ign_ros2_control/ign_ros2_control_demos
-
-      # delete the directory since we don't want rosdep to pull the deps
-      rm -rf ros_gz/ros_ign_gazebo_demos
-      # temporary, it depends on some odds version of ign libs, https://github.com/gazebosim/ros_gz/issues/40
-      rm -rf ros_gz/ros_ign_point_cloud
-
-      # place artifical package.xml files in ign directories
-      ls gz_packages_XML | awk -F. '{printf("mv gz_packages_XML/%s.xml %s/package.xml\n", $1, $1)}' | sh
-
-      sed -i "s|\${CMAKE_INSTALL_PREFIX}|/snap/$SNAPCRAFT_PROJECT_NAME/current/opt/ros/snap|" gz-sim/include/ignition/gazebo/config.hh.in
-      sed -i "s|\${CMAKE_INSTALL_PREFIX}|/snap/$SNAPCRAFT_PROJECT_NAME/current/opt/ros/snap|" gz-gui/include/gz/gui/config.hh.in
-      sed -i "s|IGN_RENDERING_PLUGIN_PATH|\"/snap/$SNAPCRAFT_PROJECT_NAME/current/opt/ros/snap/lib\"|" gz-rendering/src/RenderEngineManager.cc
-      sed -i "s|OGRE2_RESOURCE_PATH|\"/snap/$SNAPCRAFT_PROJECT_NAME/current/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/OGRE-2.1/OGRE\"|" gz-rendering/ogre2/src/Ogre2RenderEngine.cc
-      sed -i "s|OGRE_RESOURCE_PATH|\"/snap/$SNAPCRAFT_PROJECT_NAME/current/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/OGRE-1.9.0\"|" gz-rendering/ogre/src/OgreRenderEngine.cc
-      sed -i "s|@IGN_SENSORS_PLUGIN_PATH@|/snap/$SNAPCRAFT_PROJECT_NAME/current/opt/ros/snap/lib|" gz-sensors/include/gz/sensors/config.hh.in
-      sed -i 's|\${IGNITION_RENDERING_ENGINE_INSTALL_DIR}|/snap/$SNAPCRAFT_PROJECT_NAME/current/opt/ros/snap/lib/ign-rendering-3/engine-plugins|' gz-rendering/include/gz/rendering/config.hh.in
-
-      # artificial ign package.xml are not "installed" so rosdep try to redownload them
-      sed -i 's|<depend>ignition-plugin<\/depend>|<build_depend>ignition-plugin1<\/build_depend>|' ign_ros2_control/ign_ros2_control/package.xml
-      sed -i '/ignition-.*<\/depend/s/depend/build_depend/g' ign_ros2_control/ign_ros2_control/package.xml
-      find ros_gz -name package.xml -exec sed -i '/ignition-.*<\/depend/s/depend/build_depend/g' {} \;
-
-      # replace dependencies to ignition- packages to gazebo- packages
-      find . -name package.xml -exec sed -i '/ignition-.*</s/ignition/gazebo/g' {} \;
-
-      sed -i '/ros_ign_gazebo_demos/d' ros_gz/ros_ign/package.xml
+      craftctl default
+      scripts/override_pull.sh
 
     override-build: |
-      snapcraftctl build
+      craftctl default
       for entry in "$SNAPCRAFT_PART_INSTALL/opt/ros/snap/share/ignition"/*.yaml; do
         sed -i "s|$SNAPCRAFT_PART_INSTALL|/snap/$SNAPCRAFT_PROJECT_NAME/current|" "$entry"
       done
@@ -224,69 +193,7 @@ parts:
     plugin: nil
     build-packages: [fd-find] # installing fd-find and run it once is usually faster than calling find once
     override-prime: |
-      #### remove content sharing snap duplicate
-      KDE_CONTENT_SNAP=$(echo $SNAPCRAFT_CMAKE_ARGS | sed -n 's/.*\/snap\/\(.*\)-sdk.*/\1/p')
-      # remove duplicated files available in content snap
-      for snap in "core20" $KDE_CONTENT_SNAP; do  # list all content-snaps and base snaps you're using here
-          snap install $snap
-          # we don't delete symlink
-          cd "/snap/$snap/current/" && fdfind . --type f --exec rm -f "$SNAPCRAFT_PRIME/{}" \;
-          # we delete symlink pointing to nowhere
-          find "$SNAPCRAFT_PRIME" -xtype l -delete
-      done
-      ####
-
-      #### remove unnecessary files
-      # remove every header and source file
-      fdfind --type file --type symlink '.*\.(hpp|hxx|h|hh|cpp|cxx|c|cc)$' $SNAPCRAFT_PRIME  --exec rm {}
-      # remove every cmake file
-      fdfind --type file --type symlink '(.cmake|CMakeLists.txt)$' $SNAPCRAFT_PRIME  --exec rm {}
-      # remove every example(s) directories
-      fdfind --type directory "^examples?$" $SNAPCRAFT_PRIME --exec rm -rf {}
-      # remove man files
-      rm -rf $SNAPCRAFT_PRIME/usr/share/man
-      # remove doc files
-      rm -rf $SNAPCRAFT_PRIME/usr/share/doc
-      # remove perl share files
-      rm -rf $SNAPCRAFT_PRIME/usr/share/perl
-      # remove /usr/src/
-      rm -rf $SNAPCRAFT_PRIME/usr/src
-      # remove additional sources
-      rm -rf $SNAPCRAFT_PRIME/opt/ros/foxy/src/
-      ####
-
-      #### remove unnecessary debian packages
-      function remove-apt-package () {
-        # because of the previous cleanup, we might have deleted headers that were installed by Debian packages, hence we ignore listing a file that no longer exist
-        set +o pipefail
-        $(dpkg -L $1 | xargs -I {} bash -c 'ls -ld $SNAPCRAFT_PRIME{} 2> /dev/null || true' | grep -v "^d" | awk '{print $NF}' | xargs rm -f)
-        # remove empty directories
-        $(dpkg -L $1 | xargs -I {} bash -c 'ls -ld $SNAPCRAFT_PRIME{} 2> /dev/null || true' | grep "^d" | tail -n +2 | awk '{print $NF}' | xargs -I {} rmdir --ignore-fail-on-non-empty {})
-        set -o pipefail
-      }
-
-      function remove-apt-package-with-prefix () {
-        for pkg in $(dpkg --get-selections "$1*" | awk '{print $1}')
-        do
-          remove-apt-package $pkg
-        done
-      }
-
-      remove-apt-package ros-foxy-rosidl-adapter
-      remove-apt-package ros-foxy-rosidl-generator-c
-      remove-apt-package ros-foxy-rosidl-generator-cpp
-      remove-apt-package ros-foxy-rosidl-generator-py
-      remove-apt-package ros-foxy-ament-cmake-gmock
-      remove-apt-package ros-foxy-python-cmake-module
-      remove-apt-package python3-pytest
-
-      # remove globs of packages
-      remove-apt-package-with-prefix ros-foxy-ament-cmake
-      remove-apt-package-with-prefix ros-foxy-testing
-      remove-apt-package-with-prefix python3-colcon
-      remove-apt-package-with-prefix python3-rosdep
-      remove-apt-package-with-prefix cmake
-      ####
+      /root/project/snap/local/cleanup.sh
 
 apps:
 
