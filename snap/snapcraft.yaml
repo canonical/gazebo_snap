@@ -1,5 +1,5 @@
 name: gazebo
-version: citadel
+version: fortress
 summary: Simulate before you build.
 description: |
   Gazebo (formerly known as Ignition [1]) is an open source robotics simulator maintained by Open Robotics [2].
@@ -42,7 +42,7 @@ license: Apache-2.0
 
 grade: devel
 confinement: strict
-base: core20
+base: core22
 
 # The 'kde-neon' extension is only supported for amd64 atm.
 # Gazebo support for arm64 is 'best-effort'
@@ -60,7 +60,6 @@ package-repositories:
 
 parts:
   gazebo:
-    after: [kde-neon-extension]
     plugin: colcon
     source: .
     colcon-cmake-args:
@@ -75,8 +74,13 @@ parts:
       - "-DCMAKE_SKIP_RPATH=TRUE"
       - "-DCMAKE_PREFIX_PATH=$(echo $SNAPCRAFT_CMAKE_ARGS | awk -F= '{printf(\"%s/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/cmake/Qt5\", $2)}')"
       - "--event-handlers=console_direct+"
+      - "--executor sequential"
+
     build-environment:
-      - IGNITION_VERSION: citadel
+      - IGNITION_VERSION: fortress
+      - GZ_VERSION: fortress
+      - PKG_CONFIG_PATH: ""
+      - MAKEFLAGS: " -j1"
     build-packages:
       - wget
       - git
@@ -103,7 +107,7 @@ parts:
       - libgts-dev
       - libjsoncpp-dev
       - libogre-1.9-dev
-      - libogre-2.1-dev
+      - libogre-2.2-dev
       - libprotobuf-dev
       - libprotoc-dev
       - libsqlite3-dev
@@ -121,7 +125,7 @@ parts:
       - python3-distutils
       - python3-psutil
       - python3-pybind11
-      - python-yaml
+      - python3-yaml
       - rubocop
       - ruby
       - ruby-dev
@@ -133,82 +137,54 @@ parts:
     stage-packages:
       - libcurl4
       - libyaml-dev
-      - libjsoncpp1
+      - libjsoncpp25
       - libassimp5
-      - libboost-regex1.71.0
-      - libboost-thread1.71.0
+      - libboost-regex1.74.0
+      - libboost-thread1.74.0
+      - libboost-iostreams1.74.0
+      - libboost-program-options1.74.0
+      - libboost-filesystem1.74.0
       - libccd2
-      - libconsole-bridge0.4
+      - libconsole-bridge1.0
       - libev4
-      - libfcl0.5
+      - libfcl0.7
       - libfreeimage3
       - libbinutils
       - libgts-0.7-5
-      - libilmbase24
+      - libilmbase25
       - libjxr0
       - libnorm1
       - liboctomap1.9
       - libode8
-      - libopenexr24
-      - libpgm-5.2-0
-      - libprotobuf17
-      - libraw19
-      - libruby2.7
+      - libopenexr25
+      - libpgm-5.3-0
+      - libprotobuf23
+      - libraw20
+      - libruby3.0
       - libsodium23
-      - libtinyxml2-6a
+      - libtinyxml2-9
       - libtinyxml2.6.2v5
-      - liburdfdom-model
-      - libwebsockets15
+      - liburdfdom-model3.0
+      - libwebsockets16
       - libxaw7
       - libxmu6
       - libxpm4
       - libzmq5
-      - libdart6
-      - libdart6-collision-bullet
-      - libdart6-collision-ode
-      - libdart6-external-odelcpsolver
+      - libdart6.12
+      - libdart-collision-bullet6.12
+      - libdart-collision-ode6.12
+      - libdart-external-odelcpsolver6.12
       - libogre-1.9.0v5
-      - libogre-2.1
-      - ros-foxy-ros-environment
-      - ros-foxy-ros2-controllers
+      - libogre-2.2
+      - ros-humble-ros-environment
+      - ros-humble-ros2-controllers
 
     override-pull: |
-      snapcraftctl pull
-      if [ ! -f collection-citadel.yaml ]; then wget https://raw.githubusercontent.com/gazebo-tooling/gazebodistro/master/collection-citadel.yaml; fi
-      vcs import < collection-citadel.yaml
-      vcs import < ros2-ign.yaml
-
-      # delete the directory since we don't want rosdep to pull the deps
-      rm -rf ign_ros2_control/ign_ros2_control_demos
-
-      # delete the directory since we don't want rosdep to pull the deps
-      rm -rf ros_gz/ros_ign_gazebo_demos
-      # temporary, it depends on some odds version of ign libs, https://github.com/gazebosim/ros_gz/issues/40
-      rm -rf ros_gz/ros_ign_point_cloud
-
-      # place artifical package.xml files in ign directories
-      ls gz_packages_XML | awk -F. '{printf("mv gz_packages_XML/%s.xml %s/package.xml\n", $1, $1)}' | sh
-
-      sed -i "s|\${CMAKE_INSTALL_PREFIX}|/snap/$SNAPCRAFT_PROJECT_NAME/current/opt/ros/snap|" gz-sim/include/ignition/gazebo/config.hh.in
-      sed -i "s|\${CMAKE_INSTALL_PREFIX}|/snap/$SNAPCRAFT_PROJECT_NAME/current/opt/ros/snap|" gz-gui/include/gz/gui/config.hh.in
-      sed -i "s|IGN_RENDERING_PLUGIN_PATH|\"/snap/$SNAPCRAFT_PROJECT_NAME/current/opt/ros/snap/lib\"|" gz-rendering/src/RenderEngineManager.cc
-      sed -i "s|OGRE2_RESOURCE_PATH|\"/snap/$SNAPCRAFT_PROJECT_NAME/current/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/OGRE-2.1/OGRE\"|" gz-rendering/ogre2/src/Ogre2RenderEngine.cc
-      sed -i "s|OGRE_RESOURCE_PATH|\"/snap/$SNAPCRAFT_PROJECT_NAME/current/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/OGRE-1.9.0\"|" gz-rendering/ogre/src/OgreRenderEngine.cc
-      sed -i "s|@IGN_SENSORS_PLUGIN_PATH@|/snap/$SNAPCRAFT_PROJECT_NAME/current/opt/ros/snap/lib|" gz-sensors/include/gz/sensors/config.hh.in
-      sed -i 's|\${IGNITION_RENDERING_ENGINE_INSTALL_DIR}|/snap/$SNAPCRAFT_PROJECT_NAME/current/opt/ros/snap/lib/ign-rendering-3/engine-plugins|' gz-rendering/include/gz/rendering/config.hh.in
-
-      # artificial ign package.xml are not "installed" so rosdep try to redownload them
-      sed -i 's|<depend>ignition-plugin<\/depend>|<build_depend>ignition-plugin1<\/build_depend>|' ign_ros2_control/ign_ros2_control/package.xml
-      sed -i '/ignition-.*<\/depend/s/depend/build_depend/g' ign_ros2_control/ign_ros2_control/package.xml
-      find ros_gz -name package.xml -exec sed -i '/ignition-.*<\/depend/s/depend/build_depend/g' {} \;
-
-      # replace dependencies to ignition- packages to gazebo- packages
-      find . -name package.xml -exec sed -i '/ignition-.*</s/ignition/gazebo/g' {} \;
-
-      sed -i '/ros_ign_gazebo_demos/d' ros_gz/ros_ign/package.xml
+      craftctl default
+      scripts/override_pull.sh
 
     override-build: |
-      snapcraftctl build
+      craftctl default
       for entry in "$SNAPCRAFT_PART_INSTALL/opt/ros/snap/share/ignition"/*.yaml; do
         sed -i "s|$SNAPCRAFT_PART_INSTALL|/snap/$SNAPCRAFT_PROJECT_NAME/current|" "$entry"
       done
@@ -220,73 +196,11 @@ parts:
       'fastdds_no_shared_memory.xml': usr/share/
 
   cleanup:
-    after: [gazebo, ros2-foxy-extension]
+    after: [gazebo, ros2-humble-extension]
     plugin: nil
     build-packages: [fd-find] # installing fd-find and run it once is usually faster than calling find once
     override-prime: |
-      #### remove content sharing snap duplicate
-      KDE_CONTENT_SNAP=$(echo $SNAPCRAFT_CMAKE_ARGS | sed -n 's/.*\/snap\/\(.*\)-sdk.*/\1/p')
-      # remove duplicated files available in content snap
-      for snap in "core20" $KDE_CONTENT_SNAP; do  # list all content-snaps and base snaps you're using here
-          snap install $snap
-          # we don't delete symlink
-          cd "/snap/$snap/current/" && fdfind . --type f --exec rm -f "$SNAPCRAFT_PRIME/{}" \;
-          # we delete symlink pointing to nowhere
-          find "$SNAPCRAFT_PRIME" -xtype l -delete
-      done
-      ####
-
-      #### remove unnecessary files
-      # remove every header and source file
-      fdfind --type file --type symlink '.*\.(hpp|hxx|h|hh|cpp|cxx|c|cc)$' $SNAPCRAFT_PRIME  --exec rm {}
-      # remove every cmake file
-      fdfind --type file --type symlink '(.cmake|CMakeLists.txt)$' $SNAPCRAFT_PRIME  --exec rm {}
-      # remove every example(s) directories
-      fdfind --type directory "^examples?$" $SNAPCRAFT_PRIME --exec rm -rf {}
-      # remove man files
-      rm -rf $SNAPCRAFT_PRIME/usr/share/man
-      # remove doc files
-      rm -rf $SNAPCRAFT_PRIME/usr/share/doc
-      # remove perl share files
-      rm -rf $SNAPCRAFT_PRIME/usr/share/perl
-      # remove /usr/src/
-      rm -rf $SNAPCRAFT_PRIME/usr/src
-      # remove additional sources
-      rm -rf $SNAPCRAFT_PRIME/opt/ros/foxy/src/
-      ####
-
-      #### remove unnecessary debian packages
-      function remove-apt-package () {
-        # because of the previous cleanup, we might have deleted headers that were installed by Debian packages, hence we ignore listing a file that no longer exist
-        set +o pipefail
-        $(dpkg -L $1 | xargs -I {} bash -c 'ls -ld $SNAPCRAFT_PRIME{} 2> /dev/null || true' | grep -v "^d" | awk '{print $NF}' | xargs rm -f)
-        # remove empty directories
-        $(dpkg -L $1 | xargs -I {} bash -c 'ls -ld $SNAPCRAFT_PRIME{} 2> /dev/null || true' | grep "^d" | tail -n +2 | awk '{print $NF}' | xargs -I {} rmdir --ignore-fail-on-non-empty {})
-        set -o pipefail
-      }
-
-      function remove-apt-package-with-prefix () {
-        for pkg in $(dpkg --get-selections "$1*" | awk '{print $1}')
-        do
-          remove-apt-package $pkg
-        done
-      }
-
-      remove-apt-package ros-foxy-rosidl-adapter
-      remove-apt-package ros-foxy-rosidl-generator-c
-      remove-apt-package ros-foxy-rosidl-generator-cpp
-      remove-apt-package ros-foxy-rosidl-generator-py
-      remove-apt-package ros-foxy-ament-cmake-gmock
-      remove-apt-package ros-foxy-python-cmake-module
-      remove-apt-package python3-pytest
-
-      # remove globs of packages
-      remove-apt-package-with-prefix ros-foxy-ament-cmake
-      remove-apt-package-with-prefix ros-foxy-testing
-      remove-apt-package-with-prefix python3-colcon
-      remove-apt-package-with-prefix python3-rosdep
-      remove-apt-package-with-prefix cmake
-      ####
+      /root/project/snap/local/cleanup.sh
 
 apps:
 
@@ -295,28 +209,46 @@ apps:
 
   gz:
     environment:
-      RUBYLIB: '$SNAP/usr/local/lib/site_ruby/2.7.0:$SNAP/usr/local/lib/$SNAPCRAFT_ARCH_TRIPLET/site_ruby:$SNAP/usr/local/lib/site_ruby:$SNAP/usr/lib/ruby/vendor_ruby/2.7.0:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/ruby/vendor_ruby/2.7.0:$SNAP/usr/lib/ruby/vendor_ruby:$SNAP/usr/lib/ruby/2.7.0:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/ruby/2.7.0'
+      RUBYLIB: '$SNAP/usr/local/lib/site_ruby/3.0.0:$SNAP/usr/local/lib/$SNAPCRAFT_ARCH_TRIPLET/site_ruby:$SNAP/usr/local/lib/site_ruby:$SNAP/usr/lib/ruby/vendor_ruby/3.0.0:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/ruby/vendor_ruby/3.0.0:$SNAP/usr/lib/ruby/vendor_ruby:$SNAP/usr/lib/ruby/3.0.0:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/ruby/3.0.0'
       IGN_HOMEDIR: '$SNAP_USER_DATA'
+      GZ_HOMEDIR: '$SNAP_USER_DATA'
       IGN_CONFIG_PATH: '$SNAP/opt/ros/snap/share/ignition'
-      IGN_RENDERING_RESOURCE_PATH: '$SNAP/opt/ros/snap/share/ignition/ignition-rendering3'
-      IGN_GAZEBO_PHYSICS_ENGINE_PATH: '$SNAP/opt/ros/snap/lib/ign-physics-2/engine-plugins'
-      OGRE2_RESOURCE_PATH: '$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/OGRE-2.1/OGRE'
+      GZ_CONFIG_PATH: '$SNAP/opt/ros/snap/share/ignition'
+      IGN_RENDERING_RESOURCE_PATH: '$SNAP/opt/ros/snap/share/ignition/ignition-rendering6'
+      GZ_RENDERING_RESOURCE_PATH: '$SNAP/opt/ros/snap/share/ignition/ignition-rendering6'
+      IGN_GAZEBO_PHYSICS_ENGINE_PATH: '$SNAP/opt/ros/snap/lib/ign-physics-5/engine-plugins'
+      GZ_SIM_PHYSICS_ENGINE_PATH: '$SNAP/opt/ros/snap/lib/ign-physics-5/engine-plugins'
+      OGRE2_RESOURCE_PATH: '$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/OGRE-2.2/OGRE'
       OGRE_RESOURCE_PATH: '$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/OGRE-1.9.0'
       IGN_GAZEBO_SYSTEM_PLUGIN_PATH: '$SNAP/opt/ros/snap/lib'
+      GZ_SIM_SYSTEM_PLUGIN_PATH: '$SNAP/opt/ros/snap/lib'
+      IGN_RENDERING_PLUGIN_PATH: '$SNAP/opt/ros/snap/lib/ign-rendering-6/engine-plugins/:$SNAP/opt/ros/snap/lib:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/OGRE-2.2/OGRE:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/OGRE-1.9.0'
+      GZ_RENDERING_PLUGIN_PATH: '$SNAP/opt/ros/snap/lib:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/OGRE-2.2/OGRE:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/OGRE-1.9.0'
+      IGN_SENSORS_PLUGIN_PATH: '$SNAP/opt/ros/snap/lib'
+      GZ_SENSORS_PLUGIN_PATH: '$SNAP/opt/ros/snap/lib'
+      IGN_GUI_PLUGIN_PATH: $SNAP/opt/ros/snap/lib/ign-gazebo-6/plugins/gui:$SNAP/opt/ros/snap/lib/ign-gazebo-6/plugins:$SNAP/opt/ros/snap/lib/ign-gui-6/plugins'
+      LD_LIBRARY_PATH: '$SNAP/usr/local/lib/:$SNAP/usr/local/lib/$SNAPCRAFT_ARCH_TRIPLET/:$SNAP/usr/lib/:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/:$SNAP/usr/local/lib/site_ruby/3.0.0:$SNAP/usr/local/lib/$SNAPCRAFT_ARCH_TRIPLET/site_ruby:$SNAP/usr/local/lib/site_ruby:$SNAP/usr/lib/ruby/vendor_ruby/3.0.0:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/ruby/vendor_ruby/3.0.0:$SNAP/usr/lib/ruby/vendor_ruby:$SNAP/usr/lib/ruby/3.0.0:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/ruby/3.0.0:${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}'
+      IGN_GAZEBO_RENDER_ENGINE_PATH: '$SNAP/opt/ros/snap/lib/ign-rendering-6/engine-plugins/'
+      GZ_SIM_RENDER_ENGINE_PATH: '$SNAP/opt/ros/snap/lib/ign-rendering-6/engine-plugins/'
     command: usr/bin/ruby $SNAP/opt/ros/snap/bin/ign
-    plugs: [network, network-bind, home]
-    extensions: [kde-neon, ros2-foxy]
+    plugs:
+    - network
+    - network-bind
+    - home
+    extensions: [ros2-humble, kde-neon]
 
   ros-gz-create:
-    command: opt/ros/foxy/bin/ros2 run ros_ign_gazebo create
+    command: ros2 run roz_gz_sim create
     environment:
-        FASTRTPS_DEFAULT_PROFILES_FILE: ${SNAP}/usr/share/fastdds_no_shared_memory.xml
+      FASTRTPS_DEFAULT_PROFILES_FILE: ${SNAP}/usr/share/fastdds_no_shared_memory.xml
+      LD_LIBRARY_PATH: '$SNAP/usr/local/lib/:$SNAP/usr/local/lib/$SNAPCRAFT_ARCH_TRIPLET/:$SNAP/usr/lib/:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/:$SNAP/usr/local/lib/site_ruby/3.0.0:$SNAP/usr/local/lib/$SNAPCRAFT_ARCH_TRIPLET/site_ruby:$SNAP/usr/local/lib/site_ruby:$SNAP/usr/lib/ruby/vendor_ruby/3.0.0:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/ruby/vendor_ruby/3.0.0:$SNAP/usr/lib/ruby/vendor_ruby:$SNAP/usr/lib/ruby/3.0.0:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/ruby/3.0.0:${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}'
     plugs: [network, network-bind, home]
-    extensions: [ros2-foxy]
+    extensions: [ros2-humble, kde-neon]
 
   ros-gz-bridge:
-    command: opt/ros/foxy/bin/ros2 run ros_ign_bridge
+    command: ros2 run ros_gz_bridge
     environment:
-        FASTRTPS_DEFAULT_PROFILES_FILE: ${SNAP}/usr/share/fastdds_no_shared_memory.xml
+      FASTRTPS_DEFAULT_PROFILES_FILE: ${SNAP}/usr/share/fastdds_no_shared_memory.xml
+      LD_LIBRARY_PATH: '$SNAP/usr/local/lib/:$SNAP/usr/local/lib/$SNAPCRAFT_ARCH_TRIPLET/:$SNAP/usr/lib/:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/:$SNAP/usr/local/lib/site_ruby/3.0.0:$SNAP/usr/local/lib/$SNAPCRAFT_ARCH_TRIPLET/site_ruby:$SNAP/usr/local/lib/site_ruby:$SNAP/usr/lib/ruby/vendor_ruby/3.0.0:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/ruby/vendor_ruby/3.0.0:$SNAP/usr/lib/ruby/vendor_ruby:$SNAP/usr/lib/ruby/3.0.0:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/ruby/3.0.0:${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}'
     plugs: [network, network-bind, home]
-    extensions: [ros2-foxy]
+    extensions: [ros2-humble, kde-neon]
