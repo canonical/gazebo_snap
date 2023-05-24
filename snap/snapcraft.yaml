@@ -76,6 +76,16 @@ parts:
       - "-DCMAKE_PREFIX_PATH=$(echo $SNAPCRAFT_CMAKE_ARGS | awk -F= '{printf(\"%s/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/cmake/Qt5\", $2)}')"
       - "--event-handlers=console_direct+"
     build-environment:
+      - &id001
+          PATH: /snap/kf5-5-105-qt-5-15-9-core22-sdk/current/usr/bin${PATH:+:$PATH}
+      - &id002
+          XDG_DATA_DIRS: $CRAFT_STAGE/usr/share:/snap/kf5-5-105-qt-5-15-9-core22-sdk/current/usr/share:/usr/share${XDG_DATA_DIRS:+:$XDG_DATA_DIRS}
+      #- &id003
+      #    LD_LIBRARY_PATH: /snap/kf5-5-105-qt-5-15-9-core22-sdk/current/lib/$CRAFT_ARCH_TRIPLET:/snap/kf5-5-105-qt-5-15-9-core22-sdk/current/usr/lib/$CRAFT_ARCH_TRIPLET:/snap/kf5-5-105-qt-5-15-9-core22-sdk/current/usr/lib:/snap/kf5-5-105-qt-5-15-9-core22-sdk/current/usr/lib/vala-current:/snap/kf5-5-105-qt-5-15-9-core22-sdk/current/usr/lib/$CRAFT_ARCH_TRIPLET/pulseaudio${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
+      - &id003
+          ACLOCAL_PATH: /snap/kf5-5-105-qt-5-15-9-core22-sdk/current/usr/share/aclocal${ACLOCAL_PATH:+:$ACLOCAL_PATH}
+      - &id004
+          SNAPCRAFT_CMAKE_ARGS: -DCMAKE_FIND_ROOT_PATH=/snap/kf5-5-105-qt-5-15-9-core22-sdk/current${SNAPCRAFT_CMAKE_ARGS:+:$SNAPCRAFT_CMAKE_ARGS}
       - IGNITION_VERSION: fortress
       - GZ_VERSION: fortress
     build-packages:
@@ -191,13 +201,30 @@ parts:
     source: snap/local/
     organize:
       'fastdds_no_shared_memory.xml': usr/share/
+    build-environment:
+    - *id001
+    - *id002
+    - *id003
+    - *id004
 
   cleanup:
-    after: [gazebo, ros2-humble-extension]
+    after: [gazebo] #, ros2-humble-extension]
     plugin: nil
     build-packages: [fd-find] # installing fd-find and run it once is usually faster than calling find once
     override-prime: |
       /root/project/snap/local/cleanup.sh
+    build-environment:
+    - *id001
+    - *id002
+    - *id003
+    - *id004
+  kde-neon/sdk:
+    source: /snap/snapcraft/current/share/snapcraft/extensions/desktop/kde-neon
+    plugin: make
+    make-parameters:
+    - PLATFORM_PLUG=kf5-5-105-qt-5-15-9-core22
+    build-snaps:
+    - kf5-5-105-qt-5-15-9-core22-sdk
 
 apps:
 
@@ -226,11 +253,22 @@ apps:
       #IGNITION_RENDERING_ENGINE_INSTALL_DIR: '$SNAP/opt/ros/snap/lib/ign-rendering-3/engine-plugins'
       #GZ_RENDERING_ENGINE_INSTALL_DIR: '$SNAP/opt/ros/snap/lib/ign-rendering-3/engine-plugins'
       #TODO IGN_GUI_PLUGIN_PATH    Colon separated paths used to locate GUI plugins. 
+      LD_LIBRARY_PATH: '$SNAP/usr/local/lib/:$SNAP/usr/local/lib/$SNAPCRAFT_ARCH_TRIPLET/:$SNAP/usr/lib/:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/:$SNAP/usr/local/lib/site_ruby/3.0.0:$SNAP/usr/local/lib/$SNAPCRAFT_ARCH_TRIPLET/site_ruby:$SNAP/usr/local/lib/site_ruby:$SNAP/usr/lib/ruby/vendor_ruby/3.0.0:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/ruby/vendor_ruby/3.0.0:$SNAP/usr/lib/ruby/vendor_ruby:$SNAP/usr/lib/ruby/3.0.0:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/ruby/3.0.0:/snap/kf5-5-105-qt-5-15-9-core22/current/lib/$CRAFT_ARCH_TRIPLET:/snap/kf5-5-105-qt-5-15-9-core22/current/usr/lib/$CRAFT_ARCH_TRIPLET:/snap/kf5-5-105-qt-5-15-9-core22/current/usr/lib:/snap/kf5-5-105-qt-5-15-9-core22/current/usr/lib/vala-current:/snap/kf5-5-105-qt-5-15-9-core22/current/usr/lib/$CRAFT_ARCH_TRIPLET/pulseaudio${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}'
       IGN_GAZEBO_RENDER_ENGINE_PATH: '$SNAP/opt/ros/snap/lib/ign-rendering-6/engine-plugins/'
       GZ_SIM_RENDER_ENGINE_PATH: '$SNAP/opt/ros/snap/lib/ign-rendering-6/engine-plugins/'
     command: usr/bin/ruby $SNAP/opt/ros/snap/bin/ign
-    plugs: [network, network-bind, home]
-    extensions: [kde-neon, ros2-humble]
+    plugs:
+    - desktop
+    - desktop-legacy
+    - opengl
+    - wayland
+    - x11
+    - network
+    - network-bind
+    - home
+    extensions: [ros2-humble]
+    command-chain:
+    - snap/command-chain/desktop-launch
 
   ros-gz-create:
     command: opt/ros/humble/bin/ros2 run ros_ign_gazebo create
@@ -245,3 +283,33 @@ apps:
         FASTRTPS_DEFAULT_PROFILES_FILE: ${SNAP}/usr/share/fastdds_no_shared_memory.xml
     plugs: [network, network-bind, home]
     extensions: [ros2-humble]
+assumes:
+- snapd2.43
+compression: lzo
+plugs:
+    desktop:
+        mount-host-font-cache: false
+    icon-themes:
+        interface: content
+        target: $SNAP/data-dir/icons
+        default-provider: gtk-common-themes
+    sound-themes:
+        interface: content
+        target: $SNAP/data-dir/sounds
+        default-provider: gtk-common-themes
+    kf5-5-105-qt-5-15-9-core22:
+        content: kf5-5-105-qt-5-15-9-core22-all
+        interface: content
+        default-provider: kf5-5-105-qt-5-15-9-core22
+        target: $SNAP/kf5
+environment:
+    SNAP_DESKTOP_RUNTIME: $SNAP/kf5
+hooks:
+    configure:
+        plugs:
+        - desktop
+        command-chain:
+        - snap/command-chain/hooks-configure-desktop
+layout:
+    /usr/share/X11:
+        symlink: $SNAP/kf5/usr/share/X11
