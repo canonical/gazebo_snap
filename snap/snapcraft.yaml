@@ -192,7 +192,7 @@ parts:
       'fastdds_no_shared_memory.xml': usr/share/
 
   cleanup:
-    after: [gazebo]
+    after: [gazebo, ros2-humble-extension]
     plugin: nil
     build-packages: [fd-find] # installing fd-find and run it once is usually faster than calling find once
     override-prime: |
