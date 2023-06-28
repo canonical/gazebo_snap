@@ -208,7 +208,7 @@ parts:
     - *id004
 
   cleanup:
-    after: [gazebo] #, ros2-humble-extension]
+    after: [gazebo, ros2-humble-extension]
     plugin: nil
     build-packages: [fd-find] # installing fd-find and run it once is usually faster than calling find once
     override-prime: |
