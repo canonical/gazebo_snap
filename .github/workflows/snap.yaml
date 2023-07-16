@@ -21,6 +21,7 @@ jobs:
       id: build-snap
       with:
         snapcraft-args: '--enable-experimental-extensions'
+        snapcraft-channel: '7.x/candidate'
 
     # Make sure the snap is installable
     - run: |
