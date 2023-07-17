@@ -66,10 +66,11 @@ parts:
       - "-DBUILD_TESTING=OFF"
       - "-DBUILD_DOCS=OFF"
       - "-DCMAKE_BUILD_TYPE=Release"
-      - "-DCMAKE_C_COMPILER_LAUNCHER=ccache"
-      - "-DCMAKE_CXX_COMPILER_LAUNCHER=ccache"
+      #- "-DCMAKE_C_COMPILER_LAUNCHER=ccache"
+      #- "-DCMAKE_CXX_COMPILER_LAUNCHER=ccache"
       - "-DSKIP_usd=true"
       - "-DSKIP_optix=true"
+      - "-DCMAKE_CXX_FLAGS='-Q -ftime-report -fmem-report -fpre-ipa-mem-report -fpost-ipa-mem-report'"
       # We skip RPATH to hide warnings regarding libraries that are available at two different places, preventing a safe RPATH generation
       - "-DCMAKE_SKIP_RPATH=TRUE"
       - "-DCMAKE_PREFIX_PATH=$(echo $SNAPCRAFT_CMAKE_ARGS | awk -F= '{printf(\"%s/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/cmake/Qt5\", $2)}')"
@@ -81,7 +82,7 @@ parts:
       - wget
       - git
       - python3-vcstool
-      - ccache
+      #- ccache
       - binutils-dev
       - build-essential
       - cmake
