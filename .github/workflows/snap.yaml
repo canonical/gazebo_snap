@@ -17,30 +17,6 @@ jobs:
       snap-file: ${{ steps.build-snap.outputs.snap }}
     steps:
     - uses: actions/checkout@v2
-    - uses: JarvusInnovations/background-action@v1
-      name: Bootstrap System Under Test (SUT)
-      with:
-        run: |
-          bash -c "./scripts/log_stats.sh" &
-
-        wait-on: |
-          file://done.txt
-        # IMPORTANT: to use environment variables in wait-on, you must use this form: ${{ env.VAR }}
-        # See wait-on section below for all resource types and prefixes
-
-        tail: true # true = stderr,stdout
-        # This will allow you to monitor the progress live
-
-        log-output-resume: stderr
-        # Eliminates previosuly output stderr log entries from post-run output
-
-        wait-for: 100m
-
-        log-output: stderr,stdout # same as true
-
-        log-output-if: true
-        # failure = exit-early or timeout
-
     - uses: snapcore/action-build@v1
       id: build-snap
       with:

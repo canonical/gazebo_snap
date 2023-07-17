@@ -67,7 +67,7 @@ parts:
       - "-DBUILD_DOCS=OFF"
       - "-DCMAKE_BUILD_TYPE=Release"
       #- "-DCMAKE_C_COMPILER_LAUNCHER=ccache"
-      #- "-DCMAKE_CXX_COMPILER_LAUNCHER=ccache"
+      - "-DCMAKE_CXX_COMPILER_LAUNCHER=./scripts/log_stats.sh"
       - "-DSKIP_usd=true"
       - "-DSKIP_optix=true"
       - "-DCMAKE_CXX_FLAGS='-Q -ftime-report -fmem-report -fpre-ipa-mem-report -fpost-ipa-mem-report'"
