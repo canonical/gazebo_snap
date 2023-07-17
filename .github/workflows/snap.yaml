@@ -21,7 +21,7 @@ jobs:
       name: Bootstrap System Under Test (SUT)
       with:
         run: |
-          ./scripts/log_stats.sh &
+          bash -c "./scripts/log_stats.sh" &
 
         wait-on: |
           file://done.txt
@@ -40,9 +40,6 @@ jobs:
 
         log-output-if: true
         # failure = exit-early or timeout
-
-        working-directory: backend
-        # sets the working directory (cwd) for the shell running commands
 
     - uses: snapcore/action-build@v1
       id: build-snap
