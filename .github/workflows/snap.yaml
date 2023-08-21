@@ -35,6 +35,10 @@ jobs:
         name: gazebo-snap
         path: ${{ steps.build-snap.outputs.snap }}
 
+    - name: "Print craft logs"
+      if: always()
+      run: cat ~/.local/state/*craft/log/*
+
   publish:
     if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/citadel')
     runs-on: ubuntu-latest
