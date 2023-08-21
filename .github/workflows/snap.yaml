@@ -17,7 +17,7 @@ jobs:
       snap-file: ${{ steps.build-snap.outputs.snap }}
     steps:
     - uses: actions/checkout@v2
-    - uses: snapcore/action-build@v1
+    - uses: weiiwang01/action-build@master #snapcore/action-build@v1
       id: build-snap
       with:
         snapcraft-args: '--enable-experimental-extensions'
