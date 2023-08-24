@@ -12,15 +12,16 @@ on:
 
 jobs:
   build:
-    runs-on: [self-hosted, linux, X64, jammy, virtual-machine, two-xlarge] # test on self hosted canonical runners
+    runs-on: [self-hosted, linux, X64, jammy, virtual-machine, xlarge] # test on self hosted canonical runners
     outputs:
       snap-file: ${{ steps.build-snap.outputs.snap }}
     steps:
     - uses: actions/checkout@v2
-    - uses: snapcore/action-build@master
-      id: build-snap
-      with:
-        snapcraft-args: '--enable-experimental-extensions --verbose'
+    -   name: "manual snapcraft build"
+        run: |
+          apt install snapd -y
+          snap install snapcraft --classic
+          snapcraft --verbose --destructive-mode
 
     # Make sure the snap is installable
     - run: |
