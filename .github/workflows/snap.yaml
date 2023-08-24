@@ -19,7 +19,6 @@ jobs:
     - uses: actions/checkout@v2
     -   name: "manual snapcraft build"
         run: |
-          sudo apt install snapd -y
           snap install snapcraft --classic
           snapcraft --verbose --destructive-mode
 
