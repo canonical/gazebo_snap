@@ -12,7 +12,7 @@ on:
 
 jobs:
   build:
-    runs-on: [self-hosted, linux, X64, jammy, virtual-machine, xlarge] # test on self hosted canonical runners
+    runs-on: [self-hosted, linux, X64, jammy, xlarge] # test on self hosted canonical runners
     outputs:
       snap-file: ${{ steps.build-snap.outputs.snap }}
     steps:
