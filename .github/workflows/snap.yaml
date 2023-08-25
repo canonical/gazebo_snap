@@ -12,13 +12,14 @@ on:
 
 jobs:
   build:
-    runs-on: [self-hosted, linux, X64, jammy, xlarge] # test on self hosted canonical runners
+    runs-on: [ubuntu-latest] # test on self hosted canonical runners
     outputs:
       snap-file: ${{ steps.build-snap.outputs.snap }}
     steps:
     - uses: actions/checkout@v2
     -   name: "manual snapcraft build"
         run: |
+          sudo apt install snap
           sudo snap install snapcraft --classic
           snapcraft --verbose --destructive-mode
 
