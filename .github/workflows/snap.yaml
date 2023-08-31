@@ -12,7 +12,7 @@ on:
 
 jobs:
   build:
-    runs-on: [self-hosted, linux, X64, jammy, two-xlarge] # test on self hosted canonical runners
+    runs-on: [ubuntu-latest] 
     outputs:
       snap-file: ${{ steps.build-snap.outputs.snap }}
     steps:
@@ -20,7 +20,7 @@ jobs:
     - uses: snapcore/action-build@master
       id: build-snap
       with:
-        snapcraft-args: '--enable-experimental-extensions --verbose'
+        snapcraft-args: '--enable-experimental-extensions --verbose --debug --destructive-mode'
 
     # Make sure the snap is installable
     - run: |
