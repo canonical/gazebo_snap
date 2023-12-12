@@ -12,7 +12,7 @@ on:
 
 jobs:
   build:
-    runs-on: [self-hosted, linux, X64, jammy, two-xlarge] # use Canonical's runners
+    runs-on: ubuntu-latest
     outputs:
       snap-file: ${{ steps.build-snap.outputs.snap }}
     steps:
