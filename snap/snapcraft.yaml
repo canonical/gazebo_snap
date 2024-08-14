@@ -189,7 +189,7 @@ parts:
       done
       # don't try and flock() gemspecs since this is blocked by AppArmor - see
       # https://forum.snapcraft.io/t/apparmor-denials-after-transitioning-to-core22-strict-confinement/35652/8
-      sed -i 's|!solaris_platform|win_platform|' $SNAPCRAFT_PART_INSTALL/usr/lib/ruby/vendor_ruby/rubygems.rb
+      sed -i 's|!solaris_platform|win_platform|' $CRAFT_PART_INSTALL/usr/lib/ruby/vendor_ruby/rubygems.rb
 
   fastdds-no-shared-memory:
     plugin: dump
