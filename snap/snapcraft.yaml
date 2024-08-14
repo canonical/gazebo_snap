@@ -187,6 +187,9 @@ parts:
       for entry in "$SNAPCRAFT_PART_INSTALL/opt/ros/snap/share/ignition"/*.yaml; do
         sed -i "s|$SNAPCRAFT_PART_INSTALL|/snap/$SNAPCRAFT_PROJECT_NAME/current|" "$entry"
       done
+      # don't try and flock() gemspecs since this is blocked by AppArmor - see
+      # https://forum.snapcraft.io/t/apparmor-denials-after-transitioning-to-core22-strict-confinement/35652/8
+      sed -i 's|!solaris_platform|win_platform|' $CRAFT_PART_INSTALL/usr/lib/ruby/vendor_ruby/rubygems.rb
 
   fastdds-no-shared-memory:
     plugin: dump
