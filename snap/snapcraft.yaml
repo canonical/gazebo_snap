@@ -34,11 +34,12 @@ description: |
 
   [3] https://github.com/canonical/ignition_snap
 
-  [4] https://ignitionrobotics.org/home
+  [4] https://gazebosim.org/home
 
 contact: ubuntu-robotics-community@canonical.com
 issues: https://github.com/canonical/gazebo_snap
 source-code: https://github.com/canonical/gazebo_snap
+website: https://gazebosim.org/home
 license: Apache-2.0
 
 grade: stable
