@@ -36,6 +36,7 @@ description: |
 
   [4] https://ignitionrobotics.org/home
 
+contact: ubuntu-robotics-community@canonical.com
 issues: https://github.com/canonical/gazebo_snap
 source-code: https://github.com/canonical/gazebo_snap
 license: Apache-2.0
