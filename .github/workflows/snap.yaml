@@ -11,42 +11,15 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    outputs:
-      snap-file: ${{ steps.build-snap.outputs.snap }}
-    steps:
-    - uses: actions/checkout@v2
-    - uses: snapcore/action-build@v1
-      id: build-snap
-      with:
-        snapcraft-args: '--enable-experimental-extensions'
+  snaps:
+    uses: canonical/robotics-actions-workflows/.github/workflows/snap.yaml@main
+    secrets:
+      snapstore-login: ${{ secrets.STORE_LOGIN }}
+    with:
+      runs-on: '[["self-hosted", "linux", "X64", "two-xlarge", "noble"]]'
+      snap-track: '${{ github.base_ref || github.ref_name }}'
+      snap-test-script: |
+        #!/bin/bash
+        set -euxo pipefail
 
-    # Make sure the snap is installable
-    - run: |
-        sudo snap install --dangerous ${{ steps.build-snap.outputs.snap }}
-
-    # @todo Do some testing with the snap
-    - run: |
         gazebo.gz gazebo --version
-
-    - uses: actions/upload-artifact@v3
-      with:
-        name: gazebo-snap
-        path: ${{ steps.build-snap.outputs.snap }}
-
-  publish:
-    if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/citadel')
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-    - uses: actions/download-artifact@v3
-      with:
-        name: gazebo-snap
-        path: .
-    - uses: snapcore/action-publish@v1
-      env:
-        SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.STORE_LOGIN }}
-      with:
-        snap: ${{ needs.build.outputs.snap-file }}
-        release: citadel/edge
