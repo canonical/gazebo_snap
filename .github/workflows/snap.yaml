@@ -16,7 +16,7 @@ jobs:
     secrets:
       snapstore-login: ${{ secrets.STORE_LOGIN }}
     with:
-      runs-on: '[["self-hosted", "linux", "X64", "two-xlarge", "noble"]]'
+      runs-on: '[["self-hosted", "linux", "X64", "xlarge", "noble"]]'
       snap-track: '${{ github.base_ref || github.ref_name }}'
       snap-test-script: |
         #!/bin/bash
