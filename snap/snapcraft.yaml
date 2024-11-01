@@ -1,5 +1,5 @@
 name: gazebo
-version: citadel
+version: git
 summary: Simulate before you build.
 description: |
   Gazebo (formerly known as Ignition [1]) is an open source robotics simulator maintained by Open Robotics [2].
@@ -34,13 +34,15 @@ description: |
 
   [3] https://github.com/canonical/ignition_snap
 
-  [4] https://ignitionrobotics.org/home
+  [4] https://gazebosim.org/home
 
-issues: https://github.com/canonical/ignition_snap
-source-code: https://github.com/canonical/ignition_snap
+contact: ubuntu-robotics-community@canonical.com
+issues: https://github.com/canonical/gazebo_snap
+source-code: https://github.com/canonical/gazebo_snap
+website: https://gazebosim.org/home
 license: Apache-2.0
 
-grade: devel
+grade: stable
 confinement: strict
 base: core20
 
