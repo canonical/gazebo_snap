@@ -1,0 +1,22 @@
+name: promote
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Gazebo version to promote'
+        required: true
+        default: fortress
+        type: choice
+        options:
+          - fortress
+          - citadel
+
+jobs:
+  snaps:
+    uses: canonical/robotics-actions-workflows/.github/workflows/promote.yaml@main
+    secrets:
+      snapstore-login: ${{ secrets.STORE_LOGIN }}
+    with:
+      snap: gazebo
+      from-channel: '${{ inputs.version }}/candidate'
+      to-channel: '${{ inputs.version }}/stable'
