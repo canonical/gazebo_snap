@@ -1,5 +1,5 @@
 name: gazebo
-version: git
+version: '0.1'
 summary: Simulate before you build.
 description: |
   Gazebo (formerly known as Ignition [1]) is an open source robotics simulator maintained by Open Robotics [2].
