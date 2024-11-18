@@ -1,12 +1,12 @@
 name: snap
 on:
   push:
+    tags:
+      - 'fortress/*'
     branches:
-      - citadel
       - fortress
   pull_request:
     branches:
-      - citadel
       - fortress
   workflow_dispatch:
 
