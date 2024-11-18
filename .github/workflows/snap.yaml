@@ -1,13 +1,13 @@
 name: snap
 on:
   push:
+    tags:
+      - 'citadel/*'
     branches:
       - citadel
-      - fortress
   pull_request:
     branches:
       - citadel
-      - fortress
   workflow_dispatch:
 
 jobs:
