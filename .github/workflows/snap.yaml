@@ -17,7 +17,7 @@ jobs:
       snapstore-login: ${{ secrets.STORE_LOGIN }}
     with:
       runs-on: '[["self-hosted", "linux", "X64", "xlarge", "jammy"]]'
-      snap-track: '${{ github.base_ref || github.ref_name }}'
+      snap-track: fortress
       snap-test-script: |
         #!/bin/bash
         set -euxo pipefail
