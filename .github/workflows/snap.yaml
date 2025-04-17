@@ -16,6 +16,7 @@ jobs:
     secrets:
       snapstore-login: ${{ secrets.STORE_LOGIN }}
     with:
+      snapcraft-channel: '7.x/stable'
       runs-on: '[["self-hosted", "linux", "X64", "xlarge", "jammy"]]'
       snap-track: fortress
       snap-test-script: |
