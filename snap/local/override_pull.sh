@@ -4,12 +4,11 @@
       vcs import < ros2-ign.yaml
 
       # delete the directory since we don't want rosdep to pull the deps
+      rm -rf ign_ros2_control/gz_ros2_control_demos
+      rm -rf ign_ros2_control/gz_ros2_control_tests
       rm -rf ign_ros2_control/ign_ros2_control_demos
-
-      # delete the directory since we don't want rosdep to pull the deps
-      rm -rf ros_gz/ros_ign_gazebo_demos ros_gz/ros_gz_sim_demos
-      # temporary, it depends on some odds version of ign libs, https://github.com/gazebosim/ros_gz/issues/40
-      rm -rf ros_gz/ros_ign_point_cloud ros_gz/ros_gz_point_cloud
+      rm -rf ros_gz/ros_gz_sim_demos
+      rm -rf ros_gz/ros_ign_gazebo_demos
 
       # you can use fake_package_xml_generator to prepare a draft for gz_packages_XML based on the output of vcs import
       # python3 scripts/fake_package_generator.py [folder_where_vcs_imported_gz_repos]
@@ -22,7 +21,7 @@
 
       # artificial ign package.xml are not "installed" so rosdep try to redownload them
       sed -i 's|<depend>ignition-plugin<\/depend>|<build_depend>ignition-plugin1<\/build_depend>|' ign_ros2_control/ign_ros2_control/package.xml
-      sed -i '/ignition-.*<\/depend/s/depend/build_depend/g' ign_ros2_control/ign_ros2_control/package.xml
+      sed -i '/ignition-.*<\/depend/s/depend/build_depend/g' ign_ros2_control/gz_ros2_control/package.xml
       find ros_gz -name package.xml -exec sed -i '/ignition-.*<\/depend/s/depend/build_depend/g' {} \;
 
       sed -i '/ros_ign_gazebo_demos/d' ros_gz/ros_ign/package.xml
