@@ -1,9 +1,10 @@
 <?xml version="1.0"?>
 <package format="3">
-  <name>ignition-tools</name>
-  <version>1.5.0</version>
+  <name>gz-tools2</name>
+  <version>2.0.2</version>
   <description>WIP</description>
   <maintainer email="wip@wip.com">WIP</maintainer>
   <author>WIP</author>
   <license>WIP</license>
+  <build_depend>gz-cmake3</build_depend>
 </package>

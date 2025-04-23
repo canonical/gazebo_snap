@@ -1,19 +1,18 @@
 <?xml version="1.0"?>
 <package format="3">
-  <name>ignition-launch5</name>
-  <version>5.2.0</version>
+  <name>gz-launch7</name>
+  <version>7.1.1</version>
   <description>WIP</description>
   <maintainer email="wip@wip.com">WIP</maintainer>
   <author>WIP</author>
   <license>WIP</license>
-  <build_depend>ignition-cmake2</build_depend>
-  <build_depend>ignition-common4</build_depend>
-  <build_depend>ignition-utils1</build_depend>
-  <build_depend>ignition-plugin1</build_depend>
-  <build_depend>ignition-tools</build_depend>
-  <build_depend>ignition-transport11</build_depend>
-  <build_depend>ignition-msgs8</build_depend>
-  <build_depend>ignition-math6</build_depend>
-  <build_depend>ignition-gui6</build_depend>
-  <build_depend>ignition-gazebo6</build_depend>
+  <build_depend>gz-cmake3</build_depend>
+  <build_depend>gz-common5</build_depend>
+  <build_depend>gz-utils2</build_depend>
+  <build_depend>gz-plugin2</build_depend>
+  <build_depend>gz-transport13</build_depend>
+  <build_depend>gz-msgs10</build_depend>
+  <build_depend>gz-math7</build_depend>
+  <build_depend>gz-gui8</build_depend>
+  <build_depend>gz-sim8</build_depend>
 </package>
