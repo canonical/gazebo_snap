@@ -1,28 +1,24 @@
 #!/bin/bash
 
-if [ ! -f collection-harmonic.yaml ]; then wget https://raw.githubusercontent.com/gazebo-tooling/gazebodistro/master/collection-harmonic.yaml; fi
+#if [ ! -f collection-harmonic.yaml ]; then wget https://raw.githubusercontent.com/gazebo-tooling/gazebodistro/master/collection-harmonic.yaml; fi
 
-vcs import < collection-harmonic.yaml
+#vcs import < collection-harmonic.yaml
+vcs import < gz-vendors.yaml
 vcs import < ros2-ign.yaml
 
+# apply a patch to the gz_ogre_vendor repo
+cp patches/gz_ogre_next_vendor/fix-math-namespace.patch gz_ogre_next_vendor/patches/
+sed -i "s|PATCHES|PATCHES\n    patches/fix-math-namespace.patch|" gz_ogre_next_vendor/CMakeLists.txt
+
 # delete the directory since we don't want rosdep to pull the deps
-rm -rf ign_ros2_control/gz_ros2_control_demos
-rm -rf ign_ros2_control/gz_ros2_control_tests
-rm -rf ign_ros2_control/ign_ros2_control_demos
+rm -rf gz_ros2_control/gz_ros2_control_demos
+rm -rf gz_ros2_control/gz_ros2_control_tests
 rm -rf ros_gz/ros_gz_sim_demos
 rm -rf ros_gz/ros_ign_gazebo_demos
+rm -rf ros2_control/hardware_interface_testing
+rm -rf ros2_control/rqt_controller_manager
 
-# you can use fake_package_xml_generator to prepare a draft for gz_packages_XML based on the output of vcs import
-# python3 scripts/fake_package_generator.py [folder_where_vcs_imported_gz_repos]
-# place artifical package.xml files in ign directories
-ls gz_packages_XML | awk -F. '{printf("mv gz_packages_XML/%s.xml %s/package.xml\n", $1, $1)}' | sh
-sed -i "s|\${CMAKE_INSTALL_PREFIX}|/snap/$SNAPCRAFT_PROJECT_NAME/current/opt/ros/snap|" gz-gui/include/gz/gui/config.hh.in
-sed -i "s|\${CMAKE_INSTALL_PREFIX}|/snap/$SNAPCRAFT_PROJECT_NAME/current/opt/ros/snap|" gz-sim/include/gz/sim/config.hh.in
-
-# artificial ign package.xml are not "installed" so rosdep try to redownload them
-sed -i 's|<depend>ignition-plugin<\/depend>|<build_depend>ignition-plugin1<\/build_depend>|' ign_ros2_control/ign_ros2_control/package.xml
-sed -i '/ignition-.*<\/depend/s/depend/build_depend/g' ign_ros2_control/gz_ros2_control/package.xml
-find ros_gz -name package.xml -exec sed -i '/ignition-.*<\/depend/s/depend/build_depend/g' {} \;
-sed -i '/ros_ign_gazebo_demos/d' ros_gz/ros_ign/package.xml
+# we removed hardware_testing from the packages
+sed -i '/hardware_interface_testing/d' ros2_control/controller_manager/package.xml
+# we removed ros_gz_sim_demos from the packages since it pulls RViz
 sed -i '/ros_gz_sim_demos/d' ros_gz/ros_gz/package.xml
-      

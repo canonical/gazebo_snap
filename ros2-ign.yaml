@@ -1,9 +1,17 @@
 repositories:
-  ign_ros2_control:
+  gz_ros2_control:
     type: git
-    url: https://github.com/ignitionrobotics/ign_ros2_control.git
+    url: https://github.com/ros-controls/gz_ros2_control
     version: jazzy
   ros_gz:
     type: git
     url: https://github.com/gazebosim/ros_gz.git
     version: jazzy
+  sdformat-urdf:
+    type: git
+    url: https://github.com/ros/sdformat_urdf.git
+    version: jazzy
+  ros2_control:
+    type: git
+    url: https://github.com/ros-controls/ros2_control.git
+    version: master
