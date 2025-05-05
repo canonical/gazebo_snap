@@ -55,15 +55,15 @@ platforms:
         build-on: [arm64]
         build-for: [arm64]
 
-package-repositories:
-  # For dart/ogre
-  - components: [main]
-    formats: [deb]
-    key-id: D2486D2DD83DB69272AFE98867170598AF249743
-    key-server: keyserver.ubuntu.com
-    suites: [focal]
-    type: apt
-    url: http://packages.osrfoundation.org/gazebo/ubuntu-stable
+# package-repositories:
+#   # For dart/ogre
+#   - components: [main]
+#     formats: [deb]
+#     key-id: D2486D2DD83DB69272AFE98867170598AF249743
+#     key-server: keyserver.ubuntu.com
+#     suites: [focal]
+#     type: apt
+#     url: http://packages.osrfoundation.org/gazebo/ubuntu-stable
 
 parts:
   gazebo:
@@ -251,7 +251,7 @@ apps:
       GZ_SIM_INSTALL_PREFIX: '$SNAP/opt/ros/snap/opt/gz_sim_vendor'
       GZ_RENDERING_INSTALL_PREFIX: '$SNAP/opt/ros/snap/opt/gz_rendering_vendor'
     command: opt/ros/snap/opt/gz_tools_vendor/bin/gz
-    command-chain: [path_modifier.sh]
+    command-chain: [path_modifier.sh, qt_snap_environment.sh]
     plugs:
       - network
       - network-bind
