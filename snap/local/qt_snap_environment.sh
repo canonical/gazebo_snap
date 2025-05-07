@@ -35,9 +35,9 @@ export QT_XKB_CONFIG_ROOT="/usr/share/X11/xkb"
 
 # KIO specific
 # Directly fork slaves.
-export KDE_FORK_SLAVES=1
-# Path to KIO slaves.
-export KF5_LIBEXEC_DIR="$SNAP/usr/lib/$ARCH/libexec/kf5"
+# export KDE_FORK_SLAVES=1
+# # Path to KIO slaves.
+# export KF5_LIBEXEC_DIR="$SNAP/usr/lib/$ARCH/libexec/kf5"
 
 # Ensure QtChooser behaves.
 export QTCHOOSER_NO_GLOBAL_DIR=1
@@ -71,5 +71,8 @@ export QT_SELECT=5
 
 # Remove the Qt: Session management error: Could not open network socket
 export -n SESSION_MANAGER
+
+# If set by the user that launched the app, it prevents GUI from launching
+unset DBUS_SESSION_BUS_ADDRESS
 
 exec "${original_args[@]}"

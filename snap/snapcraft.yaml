@@ -65,6 +65,7 @@ platforms:
 #     type: apt
 #     url: http://packages.osrfoundation.org/gazebo/ubuntu-stable
 
+
 parts:
   gazebo:
     # after: [gnome/sdk]
@@ -243,7 +244,7 @@ apps:
       GZ_SENSORS_PLUGIN_PATH: '$SNAP/opt/ros/snap/lib'
       #IGN_GUI_PLUGIN_PATH: $SNAP/opt/ros/snap/lib/ign-gazebo-8/plugins/gui:$SNAP/opt/ros/snap/lib/ign-gazebo-8/plugins:$SNAP/opt/ros/snap/lib/ign-gui-8/plugins'
       #IGN_GAZEBO_RENDER_ENGINE_PATH: '$SNAP/opt/ros/snap/lib/ign-rendering-8/engine-plugins/'
-      GZ_SIM_RENDER_ENGINE_PATH: '$SNAP/opt/ros/snap/lib/ign-rendering-8/engine-plugins/'
+      #GZ_SIM_RENDER_ENGINE_PATH: '$SNAP/opt/ros/snap/lib/ign-rendering-8/engine-plugins/'
       GZ_MSGS_INSTALL_PREFIX: '$SNAP/opt/ros/snap/opt/gz_msgs_vendor'
       GZ_PHYSICS_INSTALL_PREFIX: '$SNAP/opt/ros/snap/opt/gz_physics_vendor'
       GZ_LAUNCH_INSTALL_PREFIX: '$SNAP/opt/ros/snap/opt/gz_launch_vendor'

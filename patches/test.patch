@@ -1,0 +1,21 @@
+diff --git a/ogre2/src/Ogre2RenderEngine.cc b/ogre2/src/Ogre2RenderEngine.cc
+index 60b89bdc..2af41123 100644
+--- a/ogre2/src/Ogre2RenderEngine.cc
++++ b/ogre2/src/Ogre2RenderEngine.cc
+@@ -464,11 +464,11 @@ bool Ogre2RenderEngine::LoadImpl(
+     gzerr << ex.what() << std::endl;
+     return false;
+   }
+-  catch (...)
+-  {
+-    gzerr << "Failed to load render-engine" << std::endl;
+-    return false;
+-  }
++//   catch (...)
++//   {
++//     gzerr << "Failed to load render-engine" << std::endl;
++//     return false;
++//   }
+ }
+ 
+ //////////////////////////////////////////////////

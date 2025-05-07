@@ -1,0 +1,13 @@
+diff --git a/src/RenderEngineManager.cc b/src/RenderEngineManager.cc
+index c4143ecf..3d668657 100644
+--- a/src/RenderEngineManager.cc
++++ b/src/RenderEngineManager.cc
+@@ -474,7 +474,7 @@ bool RenderEngineManagerPrivate::LoadEnginePlugin(
+   systemPaths.SetPluginPathEnv(this->pluginPathEnv);
+ 
+   // Add default install folder.
+-  systemPaths.AddPluginPaths(std::string(GZ_RENDERING_PLUGIN_PATH));
++  // systemPaths.AddPluginPaths(std::string(GZ_RENDERING_PLUGIN_PATH));
+   systemPaths.AddPluginPaths(gz::rendering::getEngineInstallDir());
+ 
+   // Add any preset plugin paths.
