@@ -272,6 +272,10 @@ apps:
     command-chain: [path_modifier.sh]
     environment:
       FASTRTPS_DEFAULT_PROFILES_FILE: ${SNAP}/usr/share/fastdds_no_shared_memory.xml
+      GZ_HOMEDIR: '$SNAP_USER_DATA'
+      GZ_SENSORS_PLUGIN_PATH: '$SNAP/opt/ros/snap/lib'
+      GZ_MSGS_INSTALL_PREFIX: '$SNAP/opt/ros/snap/opt/gz_msgs_vendor'
+      GZ_LAUNCH_INSTALL_PREFIX: '$SNAP/opt/ros/snap/opt/gz_launch_vendor'
     plugs: [network, network-bind, home]
     extensions: [ros2-jazzy]
 
@@ -280,5 +284,9 @@ apps:
     command-chain: [path_modifier.sh]
     environment:
       FASTRTPS_DEFAULT_PROFILES_FILE: ${SNAP}/usr/share/fastdds_no_shared_memory.xml
+      GZ_HOMEDIR: '$SNAP_USER_DATA'
+      GZ_SENSORS_PLUGIN_PATH: '$SNAP/opt/ros/snap/lib'
+      GZ_MSGS_INSTALL_PREFIX: '$SNAP/opt/ros/snap/opt/gz_msgs_vendor'
+      GZ_LAUNCH_INSTALL_PREFIX: '$SNAP/opt/ros/snap/opt/gz_launch_vendor'
     plugs: [network, network-bind, home]
     extensions: [ros2-jazzy]
