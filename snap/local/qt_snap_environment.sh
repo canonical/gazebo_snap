@@ -37,12 +37,6 @@ export QTWEBENGINEPROCESS_PATH="$SNAP/usr/lib/$ARCH/qt5/libexec/QtWebEngineProce
 export QTCOMPOSE="$SNAP/usr/share/X11/locale"
 export QT_XKB_CONFIG_ROOT="/usr/share/X11/xkb"
 
-# KIO specific
-# Directly fork slaves.
-# export KDE_FORK_SLAVES=1
-# # Path to KIO slaves.
-# export KF5_LIBEXEC_DIR="$SNAP/usr/lib/$ARCH/libexec/kf5"
-
 export XDG_CONFIG_HOME="$SNAP_USER_DATA/.config"
 ensure_dir_exists "$XDG_CONFIG_HOME"
 export XDG_DATA_HOME="$SNAP_USER_DATA/.local/share"

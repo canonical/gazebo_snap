@@ -70,10 +70,9 @@ parts:
       - "--event-handlers=console_direct+"
 
     build-environment:
-      #- IGNITION_VERSION: harmonic
       - GZ_VERSION: harmonic
-      #- PKG_CONFIG_PATH: ""
       - PYTHONPATH: "/usr/lib/python3/dist-packages"
+
     build-packages:
       - wget
       - git
@@ -83,6 +82,7 @@ parts:
       - build-essential
       - cmake
       - curl
+
     stage-packages:
       - ros-jazzy-ros-environment
 
