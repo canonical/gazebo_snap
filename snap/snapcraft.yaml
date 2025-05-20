@@ -72,6 +72,7 @@ parts:
     build-environment:
       - GZ_VERSION: harmonic
       - PYTHONPATH: "/usr/lib/python3/dist-packages"
+
     build-packages:
       - wget
       - git
@@ -114,28 +115,21 @@ apps:
   # with a (non-Ignition) Gazebo prior install.
   gz:
     environment:
-      RUBYLIB: '$SNAP/usr/local/lib/site_ruby/3.0.0:$SNAP/usr/local/lib/$SNAPCRAFT_ARCH_TRIPLET/site_ruby:$SNAP/usr/local/lib/site_ruby:$SNAP/usr/lib/ruby/vendor_ruby/3.0.0:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/ruby/vendor_ruby/3.0.0:$SNAP/usr/lib/ruby/vendor_ruby:$SNAP/usr/lib/ruby/3.0.0:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/ruby/3.0.0'
-      IGN_HOMEDIR: '$SNAP_USER_DATA'
+      RUBYLIB: '$SNAP/usr/local/lib/site_ruby/3.2.0:$SNAP/usr/local/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/site_ruby:$SNAP/usr/local/lib/site_ruby:$SNAP/usr/lib/ruby/vendor_ruby/3.2.0:$SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/ruby/vendor_ruby/3.2.0:$SNAP/usr/lib/ruby/vendor_ruby:$SNAP/usr/lib/ruby/3.2.0:$SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/ruby/3.2.0'
       GZ_HOMEDIR: '$SNAP_USER_DATA'
-      IGN_CONFIG_PATH: '$SNAP/opt/ros/snap/share/ignition'
-      GZ_CONFIG_PATH: '$SNAP/opt/ros/snap/share/ignition'
-      IGN_RENDERING_RESOURCE_PATH: '$SNAP/opt/ros/snap/share/ignition/ignition-rendering6'
-      GZ_RENDERING_RESOURCE_PATH: '$SNAP/opt/ros/snap/share/ignition/ignition-rendering6'
-      IGN_GAZEBO_PHYSICS_ENGINE_PATH: '$SNAP/opt/ros/snap/lib/ign-physics-5/engine-plugins'
-      GZ_SIM_PHYSICS_ENGINE_PATH: '$SNAP/opt/ros/snap/lib/ign-physics-5/engine-plugins'
-      OGRE2_RESOURCE_PATH: '$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/OGRE-2.2/OGRE'
-      OGRE_RESOURCE_PATH: '$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/OGRE-1.9.0'
-      IGN_GAZEBO_SYSTEM_PLUGIN_PATH: '$SNAP/opt/ros/snap/lib'
+      GZ_RENDERING_RESOURCE_PATH: '$SNAP/opt/ros/snap/opt/gz_rendering_vendor/share/gz/gz-rendering8'
+      OGRE2_RESOURCE_PATH: '$SNAP/opt/ros/snap/opt/gz_ogre_next_vendor/lib/OGRE-Next'
       GZ_SIM_SYSTEM_PLUGIN_PATH: '$SNAP/opt/ros/snap/lib'
-      IGN_RENDERING_PLUGIN_PATH: '$SNAP/opt/ros/snap/lib/ign-rendering-6/engine-plugins/:$SNAP/opt/ros/snap/lib:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/OGRE-2.2/OGRE:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/OGRE-1.9.0'
-      GZ_RENDERING_PLUGIN_PATH: '$SNAP/opt/ros/snap/lib:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/OGRE-2.2/OGRE:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/OGRE-1.9.0'
-      IGN_SENSORS_PLUGIN_PATH: '$SNAP/opt/ros/snap/lib'
+      GZ_RENDERING_PLUGIN_PATH: '$SNAP/opt/ros/snap/lib:$SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/OGRE-1.9.0'
       GZ_SENSORS_PLUGIN_PATH: '$SNAP/opt/ros/snap/lib'
-      IGN_GUI_PLUGIN_PATH: $SNAP/opt/ros/snap/lib/ign-gazebo-6/plugins/gui:$SNAP/opt/ros/snap/lib/ign-gazebo-6/plugins:$SNAP/opt/ros/snap/lib/ign-gui-6/plugins'
-      IGN_GAZEBO_RENDER_ENGINE_PATH: '$SNAP/opt/ros/snap/lib/ign-rendering-6/engine-plugins/'
-      GZ_SIM_RENDER_ENGINE_PATH: '$SNAP/opt/ros/snap/lib/ign-rendering-6/engine-plugins/'
-    command: usr/bin/ruby $SNAP/opt/ros/snap/bin/ign
-    command-chain: [path_modifier.sh]
+      GZ_SIM_RENDER_ENGINE_PATH: '$SNAP/opt/ros/snap/opt/gz_rendering_vendor/lib/gz-rendering-8/engine-plugins'
+      GZ_MSGS_INSTALL_PREFIX: '$SNAP/opt/ros/snap/opt/gz_msgs_vendor'
+      GZ_PHYSICS_INSTALL_PREFIX: '$SNAP/opt/ros/snap/opt/gz_physics_vendor'
+      GZ_LAUNCH_INSTALL_PREFIX: '$SNAP/opt/ros/snap/opt/gz_launch_vendor'
+      GZ_GUI_INSTALL_PREFIX: '$SNAP/opt/ros/snap/opt/gz_gui_vendor'
+      GZ_SIM_INSTALL_PREFIX: '$SNAP/opt/ros/snap/opt/gz_sim_vendor'
+      GZ_RENDERING_INSTALL_PREFIX: '$SNAP/opt/ros/snap/opt/gz_rendering_vendor'
+    command: opt/ros/snap/opt/gz_tools_vendor/bin/gz
     command-chain: [path_modifier.sh, qt_snap_environment.sh]
     plugs:
       - network
@@ -148,10 +142,14 @@ apps:
     extensions: [ros2-jazzy]
 
   ros-gz-create:
-    command: ros2 run roz_gz_sim create
+    command: ros2 run ros_gz_sim create
     command-chain: [path_modifier.sh]
     environment:
       FASTRTPS_DEFAULT_PROFILES_FILE: ${SNAP}/usr/share/fastdds_no_shared_memory.xml
+      GZ_HOMEDIR: '$SNAP_USER_DATA'
+      GZ_SENSORS_PLUGIN_PATH: '$SNAP/opt/ros/snap/lib'
+      GZ_MSGS_INSTALL_PREFIX: '$SNAP/opt/ros/snap/opt/gz_msgs_vendor'
+      GZ_LAUNCH_INSTALL_PREFIX: '$SNAP/opt/ros/snap/opt/gz_launch_vendor'
     plugs: [network, network-bind, home]
     extensions: [ros2-jazzy]
 
@@ -160,5 +158,9 @@ apps:
     command-chain: [path_modifier.sh]
     environment:
       FASTRTPS_DEFAULT_PROFILES_FILE: ${SNAP}/usr/share/fastdds_no_shared_memory.xml
+      GZ_HOMEDIR: '$SNAP_USER_DATA'
+      GZ_SENSORS_PLUGIN_PATH: '$SNAP/opt/ros/snap/lib'
+      GZ_MSGS_INSTALL_PREFIX: '$SNAP/opt/ros/snap/opt/gz_msgs_vendor'
+      GZ_LAUNCH_INSTALL_PREFIX: '$SNAP/opt/ros/snap/opt/gz_launch_vendor'
     plugs: [network, network-bind, home]
     extensions: [ros2-jazzy]
