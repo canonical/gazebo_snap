@@ -57,7 +57,6 @@ platforms:
 
 parts:
   gazebo:
-    after: [kde-neon/sdk]
     plugin: colcon
     source: .
     colcon-cmake-args:
@@ -68,14 +67,11 @@ parts:
       - "-DCMAKE_CXX_COMPILER_LAUNCHER=ccache"
       - "-DSKIP_usd=true"
       - "-DSKIP_optix=true"
-      # We skip RPATH to hide warnings regarding libraries that are available at two different places, preventing a safe RPATH generation
-      - "-DCMAKE_SKIP_RPATH=TRUE"
-      - "-DCMAKE_PREFIX_PATH=$(echo $SNAPCRAFT_CMAKE_ARGS | awk -F= '{printf(\"%s/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/cmake/Qt5\", $2)}')"
       - "--event-handlers=console_direct+"
 
     build-environment:
-      - PKG_CONFIG_PATH: ""
       - GZ_VERSION: harmonic
+      - PYTHONPATH: "/usr/lib/python3/dist-packages"
     build-packages:
       - wget
       - git
@@ -85,92 +81,8 @@ parts:
       - build-essential
       - cmake
       - curl
-      - freeglut3-dev
-      - libavdevice-dev
-      - libbenchmark-dev
-      - libcurl4-openssl-dev
-      - libdart-collision-bullet-dev
-      - libdart-collision-ode-dev
-      - libdart-dev
-      - libdart-external-ikfast-dev
-      - libdart-external-odelcpsolver-dev
-      - libdart-utils-urdf-dev
-      - libeigen3-dev
-      - libfreeimage-dev
-      - libgflags-dev
-      - libglew-dev
-      - libgts-dev
-      - libjsoncpp-dev
-      - libogre-1.9-dev
-      - libogre-2.2-dev
-      - libprotobuf-dev
-      - libprotoc-dev
-      - libsqlite3-dev
-      - libtinyxml2-dev
-      - liburdfdom-dev
-      - libwebsockets-dev
-      - libxi-dev
-      - libxml2-utils
-      - libxmu-dev
-      - libyaml-dev
-      - libzip-dev
-      - libzmq3-dev
-      - pkg-config
-      - protobuf-compiler
-      - python3-distutils
-      - python3-psutil
-      - python3-pybind11
-      - python3-yaml
-      - rubocop
-      - ruby
-      - ruby-dev
-      - ruby-ronn
-      - swig
-      - uuid-dev
-      - xvfb
 
     stage-packages:
-      - libcurl4
-      - libyaml-dev
-      - libjsoncpp25
-      - libassimp5
-      - libboost-regex1.74.0
-      - libboost-thread1.74.0
-      - libboost-iostreams1.74.0
-      - libboost-program-options1.74.0
-      - libboost-filesystem1.74.0
-      - libccd2
-      - libconsole-bridge1.0
-      - libev4
-      - libfcl0.7
-      - libfreeimage3
-      - libbinutils
-      - libgts-0.7-5
-      - libilmbase25
-      - libjxr0
-      - libnorm1
-      - liboctomap1.9
-      - libode8
-      - libopenexr25
-      - libpgm-5.3-0
-      - libprotobuf23
-      - libraw20
-      - libruby3.0
-      - libsodium23
-      - libtinyxml2-9
-      - libtinyxml2.6.2v5
-      - liburdfdom-model3.0
-      - libwebsockets16
-      - libxaw7
-      - libxmu6
-      - libxpm4
-      - libzmq5
-      - libdart6.12
-      - libdart-collision-bullet6.12
-      - libdart-collision-ode6.12
-      - libdart-external-odelcpsolver6.12
-      - libogre-1.9.0v5
-      - libogre-2.2
       - ros-jazzy-ros-environment
 
     override-pull: |
@@ -228,10 +140,15 @@ apps:
       GZ_SIM_RENDER_ENGINE_PATH: '$SNAP/opt/ros/snap/lib/ign-rendering-6/engine-plugins/'
     command: usr/bin/ruby $SNAP/opt/ros/snap/bin/ign
     command-chain: [path_modifier.sh]
+    command-chain: [path_modifier.sh, qt_snap_environment.sh]
     plugs:
       - network
       - network-bind
       - home
+      - desktop
+      - opengl
+      - wayland
+      - x11
     extensions: [ros2-jazzy]
 
   ros-gz-create:
