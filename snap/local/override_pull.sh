@@ -1,20 +1,11 @@
 #!/bin/bash
 
-#if [ ! -f collection-harmonic.yaml ]; then wget https://raw.githubusercontent.com/gazebo-tooling/gazebodistro/master/collection-harmonic.yaml; fi
-
-#vcs import < collection-harmonic.yaml
 vcs import < gz-vendors.yaml
 vcs import < ros2-gz.yaml
 
-#cp patches/gz_ogre_next_vendor/fix-math-namespace.patch gz_ogre_next_vendor/patches/
-#sed -i "s|PATCHES|PATCHES\n    patches/fix-math-namespace.patch|" gz_ogre_next_vendor/CMakeLists.txt
-
+# patches to remove CMAKE_INSTALL_PATH inserted in the libraries
 cp patches/gz_rendering_vendor/remove_cmake_gz_rendering_plugin_path.patch gz_libs/gz_rendering_vendor/patches/
-
-# cp patches/test.patch gz_libs/gz_rendering_vendor/patches/
-# cp patches/test1.patch gz_libs/gz_rendering_vendor/patches/
-cp patches/test2.patch gz_libs/gz_rendering_vendor/patches/
-
+cp patches/gz_rendering_vendor/remove_install_path_search.patch gz_libs/gz_rendering_vendor/patches/
 
 # delete the directory since we don't want rosdep to pull the deps
 rm -rf gz_ros2_control/gz_ros2_control_demos

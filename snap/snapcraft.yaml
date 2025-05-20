@@ -32,7 +32,7 @@ description: |
 
   [2] https://openrobotics.org/
 
-  [3] https://github.com/canonical/ignition_snap
+  [3] https://github.com/canonical/gazebo_snap
 
   [4] https://gazebosim.org/home
 
@@ -55,24 +55,8 @@ platforms:
         build-on: [arm64]
         build-for: [arm64]
 
-# package-repositories:
-#   # For dart/ogre
-#   - components: [main]
-#     formats: [deb]
-#     key-id: D2486D2DD83DB69272AFE98867170598AF249743
-#     key-server: keyserver.ubuntu.com
-#     suites: [focal]
-#     type: apt
-#     url: http://packages.osrfoundation.org/gazebo/ubuntu-stable
-
-
-# layout:
-#   /etc/glvnd/egl_vendor.d:
-#     bind: $SNAP/etc/glvnd/egl_vendor.d
-
 parts:
   gazebo:
-    # after: [gnome/sdk]
     plugin: colcon
     source: .
     colcon-cmake-args:
@@ -83,16 +67,12 @@ parts:
       - "-DCMAKE_CXX_COMPILER_LAUNCHER=ccache"
       - "-DSKIP_usd=true"
       - "-DSKIP_optix=true"
-      # We skip RPATH to hide warnings regarding libraries that are available at two different places, preventing a safe RPATH generation
-      #- "-DCMAKE_SKIP_RPATH=TRUE"
-      #- "-DCMAKE_PREFIX_PATH=$(echo $SNAPCRAFT_CMAKE_ARGS | awk -F= '{printf(\"%s/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/cmake/Qt5\", $2)}')"
       - "--event-handlers=console_direct+"
 
     build-environment:
-      - IGNITION_VERSION: harmonic
+      #- IGNITION_VERSION: harmonic
       - GZ_VERSION: harmonic
-      - PKG_CONFIG_PATH: ""
-      #- PYTHONPATH: "$PYTHONPATH:/usr/lib/python3/dist-packages"
+      #- PKG_CONFIG_PATH: ""
       - PYTHONPATH: "/usr/lib/python3/dist-packages"
     build-packages:
       - wget
@@ -103,96 +83,8 @@ parts:
       - build-essential
       - cmake
       - curl
-      # - freeglut3-dev
-      # - libavdevice-dev
-      # - libbenchmark-dev
-      # - libcurl4-openssl-dev
-      # - libdart-collision-bullet-dev
-      # - libdart-collision-ode-dev
-      # - libdart-dev
-      # - libdart-external-ikfast-dev
-      # - libdart-external-odelcpsolver-dev
-      # # - libdart-utils-urdf-dev
-      # - libeigen3-dev
-      # - libfreeimage-dev
-      # - libgflags-dev
-      # - libglew-dev
-      # - libgts-dev
-      # - libjsoncpp-dev
-      # - libogre-1.9-dev
-      # #- libogre-2.2-dev
-      # - libprotobuf-dev
-      # - libprotoc-dev
-      # - libsqlite3-dev
-      # - libtinyxml2-dev
-      # #- liburdfdom-dev
-      # - libwebsockets-dev
-      # - libxi-dev
-      # - libxml2-utils
-      # - libxmu-dev
-      # - libyaml-dev
-      # - libzip-dev
-      # - libzmq3-dev
-      # - pkg-config
-      # - protobuf-compiler
-      # #- python3-distutils
-      # #- python3-catkin-pkg
-      # - python3-psutil
-      # - python3-pybind11
-      # - python3-yaml
-      # - rubocop
-      # - ruby
-      # - ruby-dev
-      # - ruby-ronn
-      # - swig
-      # - uuid-dev
-      # - xvfb
-
     stage-packages:
-      # - libcurl4
-      # - libyaml-dev
-      # - libjsoncpp25
-      # - libassimp5
-      # - libboost-regex1.83.0
-      # - libboost-thread1.83.0
-      # - libboost-iostreams1.83.0
-      # - libboost-program-options1.83.0
-      # - libboost-filesystem1.83.0
-      # - libccd2
-      # - libconsole-bridge1.0
-      #- libev4
-      # - libfcl0.7
-      # - libfreeimage3
-      # - libbinutils
-      #- libgts-0.7-5
-      #- libilmbase25
-      # - libjxr0
-      # - libnorm1
-      # - liboctomap1.9
-      # - libode-dev
-      #- libopenexr-dev
-      #- libpgm-5.3-0
-      #- libprotobuf-dev
-      #- libraw20
-      #- libruby3.0
-      #- libsodium23
-      #- libtinyxml2-9
-      #- libtinyxml2.6.2v5
-      #- liburdfdom-model3.0
-      #- libwebsockets16
-      #- libxaw7
-      #- libxmu6
-      #- libxpm4
-      #- libzmq5
-      #- libdart6.12
-      #- libdart-collision-bullet6.12
-      #- libdart-collision-ode6.12
-      #- libdart-external-odelcpsolver6.12
-      #- libogre-1.9.0v5
-      #- libogre-2.2
       - ros-jazzy-ros-environment
-      - xterm
-      #- ros-jazzy-ros2-controllers
 
     override-pull: |
       craftctl default
@@ -203,10 +95,6 @@ parts:
       for entry in "$CRAFT_PART_INSTALL/opt/ros/snap/opt/"*/share/gz/*.yaml; do
         sed -i "s|$CRAFT_PART_INSTALL|/snap/$SNAPCRAFT_PROJECT_NAME/current|" "$entry"
       done
-      # don't try and flock() gemspecs since this is blocked by AppArmor - see
-      # https://forum.snapcraft.io/t/apparmor-denials-after-transitioning-to-core22-strict-confinement/35652/8
-      # TODO
-      # sed -i 's|!solaris_platform|win_platform|' $CRAFT_PART_INSTALL/usr/lib/ruby/vendor_ruby/rubygems.rb
 
   fastdds-no-shared-memory:
     plugin: dump
@@ -225,29 +113,15 @@ apps:
 
   # We're not creating the `gazebo` app just yet has this could conflict
   # with a (non-Ignition) Gazebo prior install.
-
   gz:
     environment:
       RUBYLIB: '$SNAP/usr/local/lib/site_ruby/3.2.0:$SNAP/usr/local/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/site_ruby:$SNAP/usr/local/lib/site_ruby:$SNAP/usr/lib/ruby/vendor_ruby/3.2.0:$SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/ruby/vendor_ruby/3.2.0:$SNAP/usr/lib/ruby/vendor_ruby:$SNAP/usr/lib/ruby/3.2.0:$SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/ruby/3.2.0'
-      #IGN_HOMEDIR: '$SNAP_USER_DATA'
       GZ_HOMEDIR: '$SNAP_USER_DATA'
-      #IGN_CONFIG_PATH: '$SNAP/opt/ros/snap/share/ignition'
-      #GZ_CONFIG_PATH: '$SNAP/opt/ros/snap/share/ignition'
-      #IGN_RENDERING_RESOURCE_PATH: '$SNAP/opt/ros/snap/share/ignition/ignition-rendering6'
       GZ_RENDERING_RESOURCE_PATH: '$SNAP/opt/ros/snap/opt/gz_rendering_vendor/share/gz/gz-rendering8'
-      #IGN_GAZEBO_PHYSICS_ENGINE_PATH: '$SNAP/opt/ros/snap/lib/gz-physics-7/engine-plugins'
-      #GZ_SIM_PHYSICS_ENGINE_PATH: '$SNAP/opt/ros/snap/lib/gz-physics-7/engine-plugins'
       OGRE2_RESOURCE_PATH: '$SNAP/opt/ros/snap/opt/gz_ogre_next_vendor/lib/OGRE-Next'
-      # OGRE_RESOURCE_PATH: '$SNAP/usr/lib/$CRAFT_ARCH_TRIPLET/OGRE-1.9.0'
-      #IGN_GAZEBO_SYSTEM_PLUGIN_PATH: '$SNAP/opt/ros/snap/lib'
       GZ_SIM_SYSTEM_PLUGIN_PATH: '$SNAP/opt/ros/snap/lib'
-      #IGN_RENDERING_PLUGIN_PATH: '$SNAP/opt/ros/snap/lib/ign-rendering-6/engine-plugins/:$SNAP/opt/ros/snap/lib:$SNAP/usr/lib/$CRAFT_ARCH_TRIPLET/OGRE-2.2/OGRE:$SNAP/usr/lib/$CRAFT_ARCH_TRIPLET/OGRE-1.9.0'
-      #GZ_RENDERING_PLUGIN_PATH: '$SNAP/opt/ros/snap/lib:$SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/OGRE-2.2/OGRE:$SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/OGRE-1.9.0'
       GZ_RENDERING_PLUGIN_PATH: '$SNAP/opt/ros/snap/lib:$SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/OGRE-1.9.0'
-      #IGN_SENSORS_PLUGIN_PATH: '$SNAP/opt/ros/snap/lib'
       GZ_SENSORS_PLUGIN_PATH: '$SNAP/opt/ros/snap/lib'
-      #IGN_GUI_PLUGIN_PATH: $SNAP/opt/ros/snap/lib/ign-gazebo-8/plugins/gui:$SNAP/opt/ros/snap/lib/ign-gazebo-8/plugins:$SNAP/opt/ros/snap/lib/ign-gui-8/plugins'
-      #IGN_GAZEBO_RENDER_ENGINE_PATH: '$SNAP/opt/ros/snap/lib/ign-rendering-8/engine-plugins/'
       GZ_SIM_RENDER_ENGINE_PATH: '$SNAP/opt/ros/snap/opt/gz_rendering_vendor/lib/gz-rendering-8/engine-plugins'
       GZ_MSGS_INSTALL_PREFIX: '$SNAP/opt/ros/snap/opt/gz_msgs_vendor'
       GZ_PHYSICS_INSTALL_PREFIX: '$SNAP/opt/ros/snap/opt/gz_physics_vendor'
