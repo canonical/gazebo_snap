@@ -66,6 +66,10 @@ platforms:
 #     url: http://packages.osrfoundation.org/gazebo/ubuntu-stable
 
 
+# layout:
+#   /etc/glvnd/egl_vendor.d:
+#     bind: $SNAP/etc/glvnd/egl_vendor.d
+
 parts:
   gazebo:
     # after: [gnome/sdk]
@@ -230,7 +234,7 @@ apps:
       #IGN_CONFIG_PATH: '$SNAP/opt/ros/snap/share/ignition'
       #GZ_CONFIG_PATH: '$SNAP/opt/ros/snap/share/ignition'
       #IGN_RENDERING_RESOURCE_PATH: '$SNAP/opt/ros/snap/share/ignition/ignition-rendering6'
-      GZ_RENDERING_RESOURCE_PATH: 'SNAP/opt/ros/snap/opt/gz_rendering_vendor/share/gz/gz-rendering8'
+      GZ_RENDERING_RESOURCE_PATH: '$SNAP/opt/ros/snap/opt/gz_rendering_vendor/share/gz/gz-rendering8'
       #IGN_GAZEBO_PHYSICS_ENGINE_PATH: '$SNAP/opt/ros/snap/lib/gz-physics-7/engine-plugins'
       #GZ_SIM_PHYSICS_ENGINE_PATH: '$SNAP/opt/ros/snap/lib/gz-physics-7/engine-plugins'
       OGRE2_RESOURCE_PATH: '$SNAP/opt/ros/snap/opt/gz_ogre_next_vendor/lib/OGRE-Next'
@@ -264,7 +268,7 @@ apps:
     extensions: [ros2-jazzy]
 
   ros-gz-create:
-    command: ros2 run roz_gz_sim create
+    command: ros2 run ros_gz_sim create
     command-chain: [path_modifier.sh]
     environment:
       FASTRTPS_DEFAULT_PROFILES_FILE: ${SNAP}/usr/share/fastdds_no_shared_memory.xml

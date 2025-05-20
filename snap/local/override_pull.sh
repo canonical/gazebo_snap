@@ -11,7 +11,9 @@ vcs import < ros2-gz.yaml
 
 cp patches/gz_rendering_vendor/remove_cmake_gz_rendering_plugin_path.patch gz_libs/gz_rendering_vendor/patches/
 
-cp patches/test.patch gz_libs/gz_rendering_vendor/patches/
+# cp patches/test.patch gz_libs/gz_rendering_vendor/patches/
+# cp patches/test1.patch gz_libs/gz_rendering_vendor/patches/
+cp patches/test2.patch gz_libs/gz_rendering_vendor/patches/
 
 
 # delete the directory since we don't want rosdep to pull the deps

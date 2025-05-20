@@ -16,7 +16,11 @@ function ensure_dir_exists() {
   [ -d "$1" ] ||  mkdir -p "$@"
 }
 
-ARCH="x86_64-linux-gnu"
+if [ "$SNAP_ARCH" = "amd64" ]; then
+  export ARCH="x86_64-linux-gnu"
+elif [ "$SNAP_ARCH" = "arm64" ]; then
+  export ARCH="aarch64-linux-gnu"
+fi
 
 # Add QT_PLUGIN_PATH (Qt Modules).
 append_dir QT_PLUGIN_PATH "$SNAP/usr/lib/$ARCH/qt5/plugins"
@@ -39,15 +43,22 @@ export QT_XKB_CONFIG_ROOT="/usr/share/X11/xkb"
 # # Path to KIO slaves.
 # export KF5_LIBEXEC_DIR="$SNAP/usr/lib/$ARCH/libexec/kf5"
 
+export XDG_CONFIG_HOME="$SNAP_USER_DATA/.config"
+ensure_dir_exists "$XDG_CONFIG_HOME"
+export XDG_DATA_HOME="$SNAP_USER_DATA/.local/share"
+ensure_dir_exists "$XDG_DATA_HOME"
+export XDG_CACHE_HOME="$SNAP_USER_DATA/.cache"
+ensure_dir_exists "$XDG_CACHE_HOME"
+
 # Ensure QtChooser behaves.
 export QTCHOOSER_NO_GLOBAL_DIR=1
 export QT_SELECT=5
 # qtchooser hardcodes reference paths, we'll need to rewrite them properly
-# ensure_dir_exists "$XDG_CONFIG_HOME/qtchooser"
-# echo "$SNAP/usr/lib/qt5/bin" > "$XDG_CONFIG_HOME/qtchooser/5.conf"
-# echo "$SNAP/usr/lib/$ARCH" >> "$XDG_CONFIG_HOME/qtchooser/5.conf"
-# echo "$SNAP/usr/lib/qt5/bin" > "$XDG_CONFIG_HOME/qtchooser/default.conf"
-# echo "$SNAP/usr/lib/$ARCH" >> "$XDG_CONFIG_HOME/qtchooser/default.conf"
+ensure_dir_exists "$XDG_CONFIG_HOME/qtchooser"
+echo "$SNAP/usr/lib/qt5/bin" > "$XDG_CONFIG_HOME/qtchooser/5.conf"
+echo "$SNAP/usr/lib/$ARCH" >> "$XDG_CONFIG_HOME/qtchooser/5.conf"
+echo "$SNAP/usr/lib/qt5/bin" > "$XDG_CONFIG_HOME/qtchooser/default.conf"
+echo "$SNAP/usr/lib/$ARCH" >> "$XDG_CONFIG_HOME/qtchooser/default.conf"
 
 # This relies on qtbase patch
 # 0001-let-qlibraryinfo-fall-back-to-locate-qt.conf-via-XDG.patch
@@ -55,19 +66,11 @@ export QT_SELECT=5
 # here are applied to everything that uses QLibraryInfo as final fallback and
 # has no XDG_* fallback before that. Currently the most interesting offender
 # is QtWebEngine which will not work unless the Data path is correctly set.
-# cat << EOF > "$XDG_CONFIG_HOME/qt.conf"
-# [Paths]
-# Data = $SNAP/usr/share/qt5/
-# Translations = $SNAP/usr/share/qt5/translations
-# EOF
-
-# if [ -e "$SNAP/usr/share/i18n" ]; then
-#     export I18NPATH="$SNAP/usr/share/i18n"
-#     locpath="$XDG_DATA_HOME/locale"
-#     ensure_dir_exists "$locpath"
-#     export LOCPATH="$locpath:/usr/lib/locale"
-#     LC_ALL=C.UTF-8 async_exec "$SNAP/snap/command-chain/locale-gen"
-# fi
+cat << EOF > "$XDG_CONFIG_HOME/qt.conf"
+[Paths]
+Data = $SNAP/usr/share/qt5/
+Translations = $SNAP/usr/share/qt5/translations
+EOF
 
 # Remove the Qt: Session management error: Could not open network socket
 export -n SESSION_MANAGER
