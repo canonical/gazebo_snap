@@ -4,15 +4,15 @@ vcs import < gz-vendors.yaml
 vcs import < ros2-gz.yaml
 
 
+# delete the directory since we don't want rosdep to pull the deps
+rm -rf gz_ros2_control/gz_ros2_control_demos
+rm -rf gz_ros2_control/gz_ros2_control_tests
+rm -rf ros_gz/ros_gz_sim_demos
+rm -rf ros_gz/ros_ign_gazebo_demos
+rm -rf ros2_control/hardware_interface_testing
+rm -rf ros2_control/rqt_controller_manager
 
-      sed -i "s|\${CMAKE_INSTALL_PREFIX}|/snap/$SNAPCRAFT_PROJECT_NAME/current/opt/ros/snap|" gz-gui/include/gz/gui/config.hh.in
-      sed -i "s|\${CMAKE_INSTALL_PREFIX}|/snap/$SNAPCRAFT_PROJECT_NAME/current/opt/ros/snap|" gz-sim/include/gz/sim/config.hh.in
-
-      # artificial ign package.xml are not "installed" so rosdep try to redownload them
-      sed -i 's|<depend>ignition-plugin<\/depend>|<build_depend>ignition-plugin1<\/build_depend>|' ign_ros2_control/ign_ros2_control/package.xml
-      sed -i '/ignition-.*<\/depend/s/depend/build_depend/g' ign_ros2_control/gz_ros2_control/package.xml
-      find ros_gz -name package.xml -exec sed -i '/ignition-.*<\/depend/s/depend/build_depend/g' {} \;
-
-      sed -i '/ros_ign_gazebo_demos/d' ros_gz/ros_ign/package.xml
-      sed -i '/ros_gz_sim_demos/d' ros_gz/ros_gz/package.xml
-      
+# we removed hardware_testing from the packages
+sed -i '/hardware_interface_testing/d' ros2_control/controller_manager/package.xml
+# we removed ros_gz_sim_demos from the packages since it pulls RViz
+sed -i '/ros_gz_sim_demos/d' ros_gz/ros_gz/package.xml

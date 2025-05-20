@@ -1,10 +1,10 @@
 #!/bin/bash
       echo $ROS_DISTRO
-      ROS_DISTRO="humble"
+      ROS_DISTRO="jazzy"
       #### remove content sharing snap duplicate
       KDE_CONTENT_SNAP=$(echo $SNAPCRAFT_CMAKE_ARGS | sed -n 's/.*\/snap\/\(.*\)-sdk.*/\1/p')
       # remove duplicated files available in content snap
-      for snap in "core22" $KDE_CONTENT_SNAP; do  # list all content-snaps and base snaps you're using here
+      for snap in "core24" $KDE_CONTENT_SNAP; do  # list all content-snaps and base snaps you're using here
           snap install $snap
           # we don't delete symlink
           cd "/snap/$snap/current/" && fdfind . --type f --exec rm -f "$SNAPCRAFT_PRIME/{}" \;
@@ -59,7 +59,6 @@
 
       # remove globs of packages
       remove-apt-package-with-prefix ros-${ROS_DISTRO}-ament-cmake
-      remove-apt-package-with-prefix ros-${ROS_DISTRO}-testing
       remove-apt-package-with-prefix python3-colcon
       remove-apt-package-with-prefix python3-rosdep
       remove-apt-package-with-prefix cmake

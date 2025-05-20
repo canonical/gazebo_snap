@@ -1,5 +1,5 @@
 name: gazebo
-version: '0.1.2'
+version: '0.1.0'
 summary: Simulate before you build.
 description: |
   Gazebo (formerly known as Ignition [1]) is an open source robotics simulator maintained by Open Robotics [2].
@@ -44,21 +44,16 @@ license: Apache-2.0
 
 grade: stable
 confinement: strict
-base: core22
+base: core24
 
-# The 'kde-neon' extension is only supported for amd64 atm.
 # Gazebo support for arm64 is 'best-effort'
-architectures: [amd64]
-
-package-repositories:
-  # For dart/ogre
-  - components: [main]
-    formats: [deb]
-    key-id: D2486D2DD83DB69272AFE98867170598AF249743
-    key-server: keyserver.ubuntu.com
-    suites: [focal]
-    type: apt
-    url: http://packages.osrfoundation.org/gazebo/ubuntu-stable
+platforms:
+    amd64:
+        build-on: [amd64]
+        build-for: [amd64]
+    arm64:
+        build-on: [arm64]
+        build-for: [arm64]
 
 parts:
   gazebo:
@@ -79,9 +74,8 @@ parts:
       - "--event-handlers=console_direct+"
 
     build-environment:
-      - IGNITION_VERSION: fortress
-      - GZ_VERSION: fortress
       - PKG_CONFIG_PATH: ""
+      - GZ_VERSION: harmonic
     build-packages:
       - wget
       - git
@@ -177,8 +171,7 @@ parts:
       - libdart-external-odelcpsolver6.12
       - libogre-1.9.0v5
       - libogre-2.2
-      - ros-humble-ros-environment
-      - ros-humble-ros2-controllers
+      - ros-jazzy-ros-environment
 
     override-pull: |
       craftctl default
@@ -200,7 +193,7 @@ parts:
       'fastdds_no_shared_memory.xml': usr/share/
 
   cleanup:
-    after: [gazebo, ros2-humble/ros2-launch]
+    after: [gazebo, ros2-jazzy/ros2-launch]
     plugin: nil
     build-packages: [fd-find] # installing fd-find and run it once is usually faster than calling find once
     override-prime: |
@@ -239,7 +232,7 @@ apps:
       - network
       - network-bind
       - home
-    extensions: [ros2-humble, kde-neon]
+    extensions: [ros2-jazzy]
 
   ros-gz-create:
     command: ros2 run roz_gz_sim create
@@ -247,7 +240,7 @@ apps:
     environment:
       FASTRTPS_DEFAULT_PROFILES_FILE: ${SNAP}/usr/share/fastdds_no_shared_memory.xml
     plugs: [network, network-bind, home]
-    extensions: [ros2-humble, kde-neon]
+    extensions: [ros2-jazzy]
 
   ros-gz-bridge:
     command: ros2 run ros_gz_bridge
@@ -255,4 +248,4 @@ apps:
     environment:
       FASTRTPS_DEFAULT_PROFILES_FILE: ${SNAP}/usr/share/fastdds_no_shared_memory.xml
     plugs: [network, network-bind, home]
-    extensions: [ros2-humble, kde-neon]
+    extensions: [ros2-jazzy]
