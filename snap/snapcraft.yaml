@@ -242,7 +242,7 @@ apps:
     extensions: [ros2-humble, kde-neon]
 
   ros-gz-create:
-    command: ros2 run roz_gz_sim create
+    command: ros2 run ros_gz_sim create
     command-chain: [path_modifier.sh]
     environment:
       FASTRTPS_DEFAULT_PROFILES_FILE: ${SNAP}/usr/share/fastdds_no_shared_memory.xml
