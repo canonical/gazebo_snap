@@ -7,7 +7,7 @@ vcs import < ros2-gz.yaml
 cp patches/gz_rendering_vendor/remove_cmake_gz_rendering_plugin_path.patch gz_libs/gz_rendering_vendor/patches/
 cp patches/gz_rendering_vendor/remove_install_path_search.patch gz_libs/gz_rendering_vendor/patches/
 
-# delete the directory since we don't want rosdep to pull the deps
+# delete the directories we don't intend to build to prevent rosdep from pulling their deps
 rm -rf gz_ros2_control/gz_ros2_control_demos
 rm -rf gz_ros2_control/gz_ros2_control_tests
 rm -rf ros_gz/ros_gz_sim_demos
