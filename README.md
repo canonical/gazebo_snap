@@ -27,7 +27,7 @@ that encapsulate all the essentials for robotic simulation.</p>
 
 ## Run
 
-You can run the command-line `gazebo.gz` has the Gazebo CLI tool,
+You can run the command-line `gazebo.gz` as the Gazebo CLI tool,
 e.g. `gazebo.gz sim empty.sdf` opens the Gazebo simulator
 with an empty world.
 
