@@ -17,7 +17,7 @@ jobs:
       snapstore-login: ${{ secrets.STORE_LOGIN }}
     with:
       snapcraft-channel: 'latest/stable'
-      runs-on: '["self-hosted-linux-X64-jammy-xlarge", "self-hosted-linux-ARM64-noble-large"]'
+      runs-on: '["self-hosted-linux-amd64-jammy-xlarge", "self-hosted-linux-arm64-noble-large"]'
       snap-track: harmonic
       snap-test-script: |
         #!/bin/bash
