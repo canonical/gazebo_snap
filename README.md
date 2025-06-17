@@ -27,21 +27,9 @@ that encapsulate all the essentials for robotic simulation.</p>
 
 ## Run
 
-You can run the command-line `ignition-robotics.ign` has the Ignition CLI tool,
-e.g. `ignition-robotics.ign gazebo empty.sdf` opens the Ignition Gazebo simulator
+You can run the command-line `gazebo.gz` as the Gazebo CLI tool,
+e.g. `gazebo.gz sim empty.sdf` opens the Gazebo simulator
 with an empty world.
 
-You can also simply search for `Ignition-robotics` in the dash.
-It open gazebo and is equivalent to the command `ignition-robotics.ign gazebo`.
-
-## Troubleshooting
-
-```bash
-Qt: Session management error: Could not open network socket
-```
-
-Try the following before launching Gazebo,
-
-```bash
-unset SESSION_MANAGER
-```
+You can also simply search for `gazebo` in the dash.
+It opens gazebo and is equivalent to the command `gazebo.gz sim`.

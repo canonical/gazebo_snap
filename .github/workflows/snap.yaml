@@ -2,12 +2,12 @@ name: snap
 on:
   push:
     tags:
-      - 'fortress/*'
+      - 'harmonic/*'
     branches:
-      - fortress
+      - harmonic
   pull_request:
     branches:
-      - fortress
+      - harmonic
   workflow_dispatch:
 
 jobs:
@@ -16,11 +16,11 @@ jobs:
     secrets:
       snapstore-login: ${{ secrets.STORE_LOGIN }}
     with:
-      snapcraft-channel: '7.x/stable'
-      runs-on: '[["self-hosted", "linux", "X64", "xlarge", "jammy"]]'
-      snap-track: fortress
+      snapcraft-channel: 'latest/stable'
+      runs-on: '["self-hosted-linux-amd64-jammy-xlarge", "self-hosted-linux-arm64-noble-large"]'
+      snap-track: harmonic
       snap-test-script: |
         #!/bin/bash
         set -euxo pipefail
 
-        gazebo.gz gazebo --version
+        gazebo.gz sim --version

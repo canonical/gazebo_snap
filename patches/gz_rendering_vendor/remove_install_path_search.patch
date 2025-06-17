@@ -1,0 +1,15 @@
+diff --git a/ogre2/src/Ogre2RenderEngine.cc b/ogre2/src/Ogre2RenderEngine.cc
+index 60b89bdc..7dea09df 100644
+--- a/ogre2/src/Ogre2RenderEngine.cc
++++ b/ogre2/src/Ogre2RenderEngine.cc
+@@ -157,8 +157,8 @@ Ogre2RenderEngine::Ogre2RenderEngine() :
+   std::string ogrePath = std::string(OGRE2_RESOURCE_PATH);
+   std::vector<std::string> paths = common::Split(ogrePath,
+       common::SystemPaths::Delimiter());
+-  for (const auto &path : paths)
+-    this->ogrePaths.push_back(path);
++//   for (const auto &path : paths)
++//     this->ogrePaths.push_back(path);
+ 
+   const char *env = std::getenv("OGRE2_RESOURCE_PATH");
+   if (env)

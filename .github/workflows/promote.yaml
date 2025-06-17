@@ -8,6 +8,7 @@ on:
         default: fortress
         type: choice
         options:
+          - harmonic
           - fortress
           - citadel
 

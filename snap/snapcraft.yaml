@@ -1,5 +1,5 @@
 name: gazebo
-version: '0.1.2'
+version: '0.1.0'
 summary: Simulate before you build.
 description: |
   Gazebo (formerly known as Ignition [1]) is an open source robotics simulator maintained by Open Robotics [2].
@@ -32,7 +32,7 @@ description: |
 
   [2] https://openrobotics.org/
 
-  [3] https://github.com/canonical/ignition_snap
+  [3] https://github.com/canonical/gazebo_snap
 
   [4] https://gazebosim.org/home
 
@@ -44,25 +44,19 @@ license: Apache-2.0
 
 grade: stable
 confinement: strict
-base: core22
+base: core24
 
-# The 'kde-neon' extension is only supported for amd64 atm.
 # Gazebo support for arm64 is 'best-effort'
-architectures: [amd64]
-
-package-repositories:
-  # For dart/ogre
-  - components: [main]
-    formats: [deb]
-    key-id: D2486D2DD83DB69272AFE98867170598AF249743
-    key-server: keyserver.ubuntu.com
-    suites: [focal]
-    type: apt
-    url: http://packages.osrfoundation.org/gazebo/ubuntu-stable
+platforms:
+    amd64:
+        build-on: [amd64]
+        build-for: [amd64]
+    arm64:
+        build-on: [arm64]
+        build-for: [arm64]
 
 parts:
   gazebo:
-    after: [kde-neon/sdk]
     plugin: colcon
     source: .
     colcon-cmake-args:
@@ -73,15 +67,12 @@ parts:
       - "-DCMAKE_CXX_COMPILER_LAUNCHER=ccache"
       - "-DSKIP_usd=true"
       - "-DSKIP_optix=true"
-      # We skip RPATH to hide warnings regarding libraries that are available at two different places, preventing a safe RPATH generation
-      - "-DCMAKE_SKIP_RPATH=TRUE"
-      - "-DCMAKE_PREFIX_PATH=$(echo $SNAPCRAFT_CMAKE_ARGS | awk -F= '{printf(\"%s/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/cmake/Qt5\", $2)}')"
       - "--event-handlers=console_direct+"
 
     build-environment:
-      - IGNITION_VERSION: fortress
-      - GZ_VERSION: fortress
-      - PKG_CONFIG_PATH: ""
+      - GZ_VERSION: harmonic
+      - PYTHONPATH: "/usr/lib/python3/dist-packages"
+
     build-packages:
       - wget
       - git
@@ -91,94 +82,9 @@ parts:
       - build-essential
       - cmake
       - curl
-      - freeglut3-dev
-      - libavdevice-dev
-      - libbenchmark-dev
-      - libcurl4-openssl-dev
-      - libdart-collision-bullet-dev
-      - libdart-collision-ode-dev
-      - libdart-dev
-      - libdart-external-ikfast-dev
-      - libdart-external-odelcpsolver-dev
-      - libdart-utils-urdf-dev
-      - libeigen3-dev
-      - libfreeimage-dev
-      - libgflags-dev
-      - libglew-dev
-      - libgts-dev
-      - libjsoncpp-dev
-      - libogre-1.9-dev
-      - libogre-2.2-dev
-      - libprotobuf-dev
-      - libprotoc-dev
-      - libsqlite3-dev
-      - libtinyxml2-dev
-      - liburdfdom-dev
-      - libwebsockets-dev
-      - libxi-dev
-      - libxml2-utils
-      - libxmu-dev
-      - libyaml-dev
-      - libzip-dev
-      - libzmq3-dev
-      - pkg-config
-      - protobuf-compiler
-      - python3-distutils
-      - python3-psutil
-      - python3-pybind11
-      - python3-yaml
-      - rubocop
-      - ruby
-      - ruby-dev
-      - ruby-ronn
-      - swig
-      - uuid-dev
-      - xvfb
 
     stage-packages:
-      - libcurl4
-      - libyaml-dev
-      - libjsoncpp25
-      - libassimp5
-      - libboost-regex1.74.0
-      - libboost-thread1.74.0
-      - libboost-iostreams1.74.0
-      - libboost-program-options1.74.0
-      - libboost-filesystem1.74.0
-      - libccd2
-      - libconsole-bridge1.0
-      - libev4
-      - libfcl0.7
-      - libfreeimage3
-      - libbinutils
-      - libgts-0.7-5
-      - libilmbase25
-      - libjxr0
-      - libnorm1
-      - liboctomap1.9
-      - libode8
-      - libopenexr25
-      - libpgm-5.3-0
-      - libprotobuf23
-      - libraw20
-      - libruby3.0
-      - libsodium23
-      - libtinyxml2-9
-      - libtinyxml2.6.2v5
-      - liburdfdom-model3.0
-      - libwebsockets16
-      - libxaw7
-      - libxmu6
-      - libxpm4
-      - libzmq5
-      - libdart6.12
-      - libdart-collision-bullet6.12
-      - libdart-collision-ode6.12
-      - libdart-external-odelcpsolver6.12
-      - libogre-1.9.0v5
-      - libogre-2.2
-      - ros-humble-ros-environment
-      - ros-humble-ros2-controllers
+      - ros-jazzy-ros-environment
 
     override-pull: |
       craftctl default
@@ -186,12 +92,9 @@ parts:
 
     override-build: |
       craftctl default
-      for entry in "$SNAPCRAFT_PART_INSTALL/opt/ros/snap/share/ignition"/*.yaml; do
-        sed -i "s|$SNAPCRAFT_PART_INSTALL|/snap/$SNAPCRAFT_PROJECT_NAME/current|" "$entry"
+      for entry in "$CRAFT_PART_INSTALL/opt/ros/snap/opt/"*/share/gz/*.yaml; do
+        sed -i "s|$CRAFT_PART_INSTALL|/snap/$SNAPCRAFT_PROJECT_NAME/current|" "$entry"
       done
-      # don't try and flock() gemspecs since this is blocked by AppArmor - see
-      # https://forum.snapcraft.io/t/apparmor-denials-after-transitioning-to-core22-strict-confinement/35652/8
-      sed -i 's|!solaris_platform|win_platform|' $CRAFT_PART_INSTALL/usr/lib/ruby/vendor_ruby/rubygems.rb
 
   fastdds-no-shared-memory:
     plugin: dump
@@ -200,7 +103,7 @@ parts:
       'fastdds_no_shared_memory.xml': usr/share/
 
   cleanup:
-    after: [gazebo, ros2-humble/ros2-launch]
+    after: [gazebo, ros2-jazzy/ros2-launch]
     plugin: nil
     build-packages: [fd-find] # installing fd-find and run it once is usually faster than calling find once
     override-prime: |
@@ -210,49 +113,54 @@ apps:
 
   # We're not creating the `gazebo` app just yet has this could conflict
   # with a (non-Ignition) Gazebo prior install.
-
   gz:
     environment:
-      RUBYLIB: '$SNAP/usr/local/lib/site_ruby/3.0.0:$SNAP/usr/local/lib/$SNAPCRAFT_ARCH_TRIPLET/site_ruby:$SNAP/usr/local/lib/site_ruby:$SNAP/usr/lib/ruby/vendor_ruby/3.0.0:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/ruby/vendor_ruby/3.0.0:$SNAP/usr/lib/ruby/vendor_ruby:$SNAP/usr/lib/ruby/3.0.0:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/ruby/3.0.0'
-      IGN_HOMEDIR: '$SNAP_USER_DATA'
+      RUBYLIB: '$SNAP/usr/local/lib/site_ruby/3.2.0:$SNAP/usr/local/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/site_ruby:$SNAP/usr/local/lib/site_ruby:$SNAP/usr/lib/ruby/vendor_ruby/3.2.0:$SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/ruby/vendor_ruby/3.2.0:$SNAP/usr/lib/ruby/vendor_ruby:$SNAP/usr/lib/ruby/3.2.0:$SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/ruby/3.2.0'
       GZ_HOMEDIR: '$SNAP_USER_DATA'
-      IGN_CONFIG_PATH: '$SNAP/opt/ros/snap/share/ignition'
-      GZ_CONFIG_PATH: '$SNAP/opt/ros/snap/share/ignition'
-      IGN_RENDERING_RESOURCE_PATH: '$SNAP/opt/ros/snap/share/ignition/ignition-rendering6'
-      GZ_RENDERING_RESOURCE_PATH: '$SNAP/opt/ros/snap/share/ignition/ignition-rendering6'
-      IGN_GAZEBO_PHYSICS_ENGINE_PATH: '$SNAP/opt/ros/snap/lib/ign-physics-5/engine-plugins'
-      GZ_SIM_PHYSICS_ENGINE_PATH: '$SNAP/opt/ros/snap/lib/ign-physics-5/engine-plugins'
-      OGRE2_RESOURCE_PATH: '$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/OGRE-2.2/OGRE'
-      OGRE_RESOURCE_PATH: '$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/OGRE-1.9.0'
-      IGN_GAZEBO_SYSTEM_PLUGIN_PATH: '$SNAP/opt/ros/snap/lib'
+      GZ_RENDERING_RESOURCE_PATH: '$SNAP/opt/ros/snap/opt/gz_rendering_vendor/share/gz/gz-rendering8'
+      OGRE2_RESOURCE_PATH: '$SNAP/opt/ros/snap/opt/gz_ogre_next_vendor/lib/OGRE-Next'
       GZ_SIM_SYSTEM_PLUGIN_PATH: '$SNAP/opt/ros/snap/lib'
-      IGN_RENDERING_PLUGIN_PATH: '$SNAP/opt/ros/snap/lib/ign-rendering-6/engine-plugins/:$SNAP/opt/ros/snap/lib:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/OGRE-2.2/OGRE:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/OGRE-1.9.0'
-      GZ_RENDERING_PLUGIN_PATH: '$SNAP/opt/ros/snap/lib:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/OGRE-2.2/OGRE:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/OGRE-1.9.0'
-      IGN_SENSORS_PLUGIN_PATH: '$SNAP/opt/ros/snap/lib'
+      GZ_RENDERING_PLUGIN_PATH: '$SNAP/opt/ros/snap/lib:$SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/OGRE-1.9.0'
       GZ_SENSORS_PLUGIN_PATH: '$SNAP/opt/ros/snap/lib'
-      IGN_GUI_PLUGIN_PATH: $SNAP/opt/ros/snap/lib/ign-gazebo-6/plugins/gui:$SNAP/opt/ros/snap/lib/ign-gazebo-6/plugins:$SNAP/opt/ros/snap/lib/ign-gui-6/plugins'
-      IGN_GAZEBO_RENDER_ENGINE_PATH: '$SNAP/opt/ros/snap/lib/ign-rendering-6/engine-plugins/'
-      GZ_SIM_RENDER_ENGINE_PATH: '$SNAP/opt/ros/snap/lib/ign-rendering-6/engine-plugins/'
-    command: usr/bin/ruby $SNAP/opt/ros/snap/bin/ign
-    command-chain: [path_modifier.sh]
+      GZ_SIM_RENDER_ENGINE_PATH: '$SNAP/opt/ros/snap/opt/gz_rendering_vendor/lib/gz-rendering-8/engine-plugins'
+      GZ_MSGS_INSTALL_PREFIX: '$SNAP/opt/ros/snap/opt/gz_msgs_vendor'
+      GZ_PHYSICS_INSTALL_PREFIX: '$SNAP/opt/ros/snap/opt/gz_physics_vendor'
+      GZ_LAUNCH_INSTALL_PREFIX: '$SNAP/opt/ros/snap/opt/gz_launch_vendor'
+      GZ_GUI_INSTALL_PREFIX: '$SNAP/opt/ros/snap/opt/gz_gui_vendor'
+      GZ_SIM_INSTALL_PREFIX: '$SNAP/opt/ros/snap/opt/gz_sim_vendor'
+      GZ_RENDERING_INSTALL_PREFIX: '$SNAP/opt/ros/snap/opt/gz_rendering_vendor'
+    command: opt/ros/snap/opt/gz_tools_vendor/bin/gz
+    command-chain: [path_modifier.sh, qt_snap_environment.sh]
     plugs:
       - network
       - network-bind
       - home
-    extensions: [ros2-humble, kde-neon]
+      - desktop
+      - opengl
+      - wayland
+      - x11
+    extensions: [ros2-jazzy]
 
   ros-gz-create:
-    command: ros2 run roz_gz_sim create
+    command: ros2 run ros_gz_sim create
     command-chain: [path_modifier.sh]
     environment:
       FASTRTPS_DEFAULT_PROFILES_FILE: ${SNAP}/usr/share/fastdds_no_shared_memory.xml
+      GZ_HOMEDIR: '$SNAP_USER_DATA'
+      GZ_SENSORS_PLUGIN_PATH: '$SNAP/opt/ros/snap/lib'
+      GZ_MSGS_INSTALL_PREFIX: '$SNAP/opt/ros/snap/opt/gz_msgs_vendor'
+      GZ_LAUNCH_INSTALL_PREFIX: '$SNAP/opt/ros/snap/opt/gz_launch_vendor'
     plugs: [network, network-bind, home]
-    extensions: [ros2-humble, kde-neon]
+    extensions: [ros2-jazzy]
 
   ros-gz-bridge:
     command: ros2 run ros_gz_bridge
     command-chain: [path_modifier.sh]
     environment:
       FASTRTPS_DEFAULT_PROFILES_FILE: ${SNAP}/usr/share/fastdds_no_shared_memory.xml
+      GZ_HOMEDIR: '$SNAP_USER_DATA'
+      GZ_SENSORS_PLUGIN_PATH: '$SNAP/opt/ros/snap/lib'
+      GZ_MSGS_INSTALL_PREFIX: '$SNAP/opt/ros/snap/opt/gz_msgs_vendor'
+      GZ_LAUNCH_INSTALL_PREFIX: '$SNAP/opt/ros/snap/opt/gz_launch_vendor'
     plugs: [network, network-bind, home]
-    extensions: [ros2-humble, kde-neon]
+    extensions: [ros2-jazzy]
