@@ -177,8 +177,8 @@ parts:
       - libdart-external-odelcpsolver6.12
       - libogre-1.9.0v5
       - libogre-2.2
-      - ros-humble-ros-environment
-      - ros-humble-ros2-controllers
+      - ros-lyrical-ros-environment
+      - ros-lyrical-ros2-controllers
 
     override-pull: |
       craftctl default
@@ -200,7 +200,7 @@ parts:
       'fastdds_no_shared_memory.xml': usr/share/
 
   cleanup:
-    after: [gazebo, ros2-humble/ros2-launch]
+    after: [gazebo, ros2-lyrical/ros2-launch]
     plugin: nil
     build-packages: [fd-find] # installing fd-find and run it once is usually faster than calling find once
     override-prime: |
@@ -239,7 +239,7 @@ apps:
       - network
       - network-bind
       - home
-    extensions: [ros2-humble, kde-neon]
+    extensions: [ros2-lyrical, kde-neon]
 
   ros-gz-create:
     command: ros2 run ros_gz_sim create
@@ -247,7 +247,7 @@ apps:
     environment:
       FASTRTPS_DEFAULT_PROFILES_FILE: ${SNAP}/usr/share/fastdds_no_shared_memory.xml
     plugs: [network, network-bind, home]
-    extensions: [ros2-humble, kde-neon]
+    extensions: [ros2-lyrical, kde-neon]
 
   ros-gz-bridge:
     command: ros2 run ros_gz_bridge
@@ -255,4 +255,4 @@ apps:
     environment:
       FASTRTPS_DEFAULT_PROFILES_FILE: ${SNAP}/usr/share/fastdds_no_shared_memory.xml
     plugs: [network, network-bind, home]
-    extensions: [ros2-humble, kde-neon]
+    extensions: [ros2-lyrical, kde-neon]
